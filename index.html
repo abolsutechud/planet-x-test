@@ -1,1125 +1,1020 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Paisa Bolta Hai</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Planet X Economy Simulation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --g1:#00D68A;--g2:#00AA6E;
-  --amber:#FFB830;--red:#FF5252;--blue:#4DA8FF;--purple:#A374FF;--pink:#FF6EC7;--teal:#00E5CC;
-  --bg:#0A0A18;--bg2:#12122A;--bg3:#1A1A36;--bg4:#222248;
-  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.18);
-  --txt:#F4F4FF;--txt2:#9898C0;--txt3:#C8C8EE;
-  --card-r:20px;--card-r-sm:14px;
-}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;font-size:15px}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 40% at 20% 0%,rgba(0,214,138,.07),transparent),radial-gradient(ellipse 60% 35% at 80% 100%,rgba(163,116,255,.07),transparent);pointer-events:none;z-index:0}
-.screen{position:relative;z-index:1}
-.screen{display:none;min-height:100vh}.screen.on{display:block}
-.label{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--txt2);font-weight:700}
-
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.04em}
-.badge-g{background:rgba(0,214,138,.18);color:#00D68A;border:1px solid rgba(0,214,138,.35)}
-.badge-a{background:rgba(255,184,48,.18);color:#FFB830;border:1px solid rgba(255,184,48,.35)}
-.badge-b{background:rgba(77,168,255,.18);color:#4DA8FF;border:1px solid rgba(77,168,255,.35)}
-.badge-p{background:rgba(163,116,255,.18);color:#A374FF;border:1px solid rgba(163,116,255,.35)}
-.badge-r{background:rgba(255,82,82,.18);color:#FF5252;border:1px solid rgba(255,82,82,.35)}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 20px;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .18s;letter-spacing:.01em}
-.btn-primary{background:linear-gradient(135deg,#00C97F,#00A36A);color:#fff;box-shadow:0 4px 14px rgba(0,201,127,.25)}
-.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,201,127,.35)}
-.btn-ghost{background:rgba(255,255,255,.07);color:var(--txt3);border:1px solid var(--border2)}
-.btn-ghost:hover{background:rgba(255,255,255,.13)}
-.btn-danger{background:rgba(255,77,77,.13);color:#FF4D4D;border:1px solid rgba(255,77,77,.3)}
-.btn-danger:hover{background:rgba(255,77,77,.22)}
-.btn-amber{background:rgba(245,166,35,.13);color:#F5A623;border:1px solid rgba(245,166,35,.3)}
-.btn-sm{padding:7px 14px;font-size:12px;border-radius:9px}
-.btn-full{width:100%}
-
-/* CARDS */
-.sec{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.3rem;margin-bottom:1rem}
-.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem}
-.sec-t{font-size:15px;font-weight:700;color:var(--txt)}
-
-/* STAT TILES */
-.stat-tile{background:var(--bg3);border:1px solid var(--border);border-radius:var(--card-r-sm);padding:1.1rem 1rem;position:relative;overflow:hidden}
-.stat-tile::before{content:'';position:absolute;inset:0;background:var(--tile-grad,none);pointer-events:none}
-.stat-l{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt2);margin-bottom:6px;font-weight:700}
-.stat-v{font-size:clamp(17px,3vw,23px);font-weight:700;color:var(--txt);line-height:1}
-.stat-s{font-size:12px;color:var(--txt2);margin-top:5px}
-.stat-ico{position:absolute;top:12px;right:12px;font-size:22px;opacity:.4}
-
-/* TOPBAR */
-.topbar{background:rgba(10,10,24,.88);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.1);padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-.topbar-logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,#00D68A,#4DA8FF,#A374FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.topbar-r{display:flex;align-items:center;gap:10px}
-.sync-dot{width:9px;height:9px;border-radius:50%;background:#00D68A;display:inline-block;animation:pulse 2s infinite;box-shadow:0 0 8px rgba(0,214,138,.6)}
-.sync-dot.off{background:#FF5252;animation:none;box-shadow:0 0 8px rgba(255,82,82,.6)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-
-/* NAV */
-.nav-tabs{display:flex;gap:3px;margin-bottom:1.4rem;overflow-x:auto;padding-bottom:2px}
-.nav-tabs::-webkit-scrollbar{height:3px}.nav-tabs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-.ntab{padding:9px 16px;font-size:13px;font-weight:600;background:none;border:1px solid transparent;border-radius:10px;cursor:pointer;color:var(--txt2);white-space:nowrap;transition:all .15s}
-.ntab.on{background:rgba(0,214,138,.14);color:#00D68A;border-color:rgba(0,214,138,.32);box-shadow:0 2px 10px rgba(0,214,138,.12)}
-.ntab:hover:not(.on){background:rgba(255,255,255,.06);color:var(--txt3);border-color:rgba(255,255,255,.1)}
-.sub-tabs{display:flex;gap:3px;margin-bottom:1.1rem;flex-wrap:wrap}
-.sub-tab{padding:7px 15px;font-size:13px;font-weight:600;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;color:var(--txt2);transition:all .15s}
-.sub-tab.on{background:rgba(0,214,138,.14);color:#00D68A;border-color:rgba(0,214,138,.32);box-shadow:0 2px 10px rgba(0,214,138,.12)}
-
-/* MAIN */
-.main{padding:1.1rem;max-width:1100px;margin:0 auto}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1rem}
-.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1rem}
-@media(min-width:600px){.g4{grid-template-columns:repeat(4,1fr)}}
-
-/* TABLE */
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt2);padding:9px 12px;border-bottom:1px solid var(--border);font-weight:700}
-td{padding:11px 12px;border-bottom:1px solid var(--border);color:var(--txt3)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-
-/* FORM */
-.field{margin-bottom:1rem}
-.field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--txt2);margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;font-size:14px;color:var(--txt);outline:none;transition:border-color .15s}
-.field input:focus,.field select:focus{border-color:var(--g1);box-shadow:0 0 0 3px rgba(0,214,138,.12)}
-.field input::placeholder{color:var(--txt2)}
-.field select option{background:var(--bg3)}
-.err{color:#FF4D4D;font-size:13px;margin-top:6px}
-
-/* LOGIN */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,201,127,.13),transparent)}
-.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:2.2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.login-logo{text-align:center;margin-bottom:1.75rem}
-.login-logo .ico{font-size:48px;margin-bottom:10px}
-.login-logo h1{font-size:24px;font-weight:800;background:linear-gradient(135deg,#00C97F,#4D9FFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.login-logo p{font-size:13px;color:var(--txt2);margin-top:4px}
-.login-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:var(--bg3);border-radius:12px;padding:5px;margin-bottom:1.75rem}
-.ltab{padding:9px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;color:var(--txt2);border-radius:8px;transition:all .15s}
-.ltab.on{background:var(--bg4);color:var(--txt);box-shadow:0 2px 10px rgba(0,0,0,.35)}
-
-/* LEADERBOARD */
-.lb-row{display:flex;align-items:center;padding:13px 15px;border-radius:14px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border);transition:all .15s}
-.lb-row:hover{border-color:rgba(255,255,255,.16);transform:translateX(2px)}
-.lb-row:first-child{border-color:rgba(255,184,48,.4);background:linear-gradient(135deg,rgba(255,184,48,.08),rgba(255,184,48,.03))}
-.lb-row:nth-child(2){border-color:rgba(200,200,240,.2);background:linear-gradient(135deg,rgba(200,200,240,.05),transparent)}
-.lb-row:nth-child(3){border-color:rgba(200,140,80,.25);background:linear-gradient(135deg,rgba(200,140,80,.07),transparent)}
-.lb-rk{font-size:20px;width:38px;flex-shrink:0}
-.lb-info{flex:1;min-width:0}
-.lb-nm{font-size:14px;font-weight:700;color:var(--txt)}
-.lb-sub{font-size:12px;color:var(--txt2);margin-top:2px}
-.lb-val{text-align:right}
-.lb-v{font-size:14px;font-weight:700;color:#00C97F}
-.lb-ch{font-size:12px;margin-top:2px}
-
-/* SCENARIO CARD */
-.sc-card{background:linear-gradient(135deg,rgba(0,214,138,.08),rgba(77,168,255,.06));border:1px solid rgba(0,214,138,.25);border-radius:var(--card-r);padding:1.3rem;margin-bottom:1rem;position:relative;overflow:hidden}
-.sc-card::after{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(0,214,138,.15),transparent 70%);pointer-events:none}
-.sc-card-title{font-size:16px;font-weight:700;color:#00D68A;margin-bottom:5px}
-.sc-card-desc{font-size:13px;color:var(--txt3);line-height:1.55;margin-bottom:11px}
-.sc-effects{display:flex;flex-wrap:wrap;gap:5px}
-.sc-eff{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
-.sc-eff.pos{background:rgba(0,214,138,.18);color:#00D68A}
-.sc-eff.neg{background:rgba(255,82,82,.18);color:#FF5252}
-.sc-eff.neu{background:rgba(255,255,255,.08);color:var(--txt2)}
-.sc-forced{background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.25);border-radius:10px;padding:10px 13px;margin-top:11px;font-size:13px;color:#FF8080}
-
-/* BAR CHART */
-.bar-chart{display:flex;align-items:flex-end;gap:5px;height:64px;margin:10px 0}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
-.bar-inner{width:100%;border-radius:5px 5px 0 0;min-height:3px;transition:height .4s}
-.bar-label{font-size:10px;color:var(--txt2);text-align:center}
-
-/* PORTFOLIO BARS */
-.pb{margin-bottom:13px}
-.pb-top{display:flex;justify-content:space-between;margin-bottom:5px}
-.pb-nm{font-size:13px;font-weight:600;color:var(--txt)}
-.pb-vl{font-size:13px;color:var(--txt2)}
-.pb-track{background:rgba(255,255,255,.06);border-radius:5px;height:9px;overflow:hidden}
-.pb-fill{height:100%;border-radius:5px;transition:width .5s}
-
-/* TRANSACTIONS */
-.tx-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-.tx-row:last-child{border-bottom:none}
-.tx-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-right:12px;flex-shrink:0}
-.tx-in{flex:1;min-width:0}
-.tx-nm{font-size:14px;font-weight:600;color:var(--txt)}
-.tx-ti{font-size:12px;color:var(--txt2);margin-top:2px}
-.tx-am{font-size:14px;font-weight:700;flex-shrink:0}
-.tx-am.neg{color:#FF5252}.tx-am.pos{color:#00D68A}
-
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(5px);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:1rem}
-@media(min-width:560px){.modal-bg{align-items:center}}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:22px 22px 16px 16px;padding:1.75rem;width:100%;max-width:500px;max-height:88vh;overflow-y:auto}
-@media(min-width:560px){.modal{border-radius:22px}}
-.modal-t{font-size:17px;font-weight:700;margin-bottom:1.25rem}
-.modal-a{display:flex;gap:9px;margin-top:1.4rem}
-.modal-a .btn{flex:1}
-
-/* MISC */
-.empty{text-align:center;color:var(--txt2);font-size:14px;padding:2.5rem}
-.toggle{position:relative;display:inline-block;width:42px;height:24px}
-.toggle input{opacity:0;width:0;height:0}
-.sl{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.1);border-radius:20px;transition:.2s}
-.sl:before{position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
-input:checked+.sl{background:var(--g1)}
-input:checked+.sl:before{transform:translateX(18px)}
-#loadingOverlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:18px}
-.spinner{width:44px;height:44px;border:3px solid rgba(0,201,127,.2);border-top-color:#00C97F;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.stock-selector{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.stock-pill{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--txt2);transition:all .15s}
-.stock-pill:hover{background:var(--bg4)}
-
-/* STATION HERO */
-.station-hero{border-radius:var(--card-r);padding:1.6rem;text-align:center;margin-bottom:1rem}
-
-/* TEAM CARD in station */
-.team-port-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--card-r-sm);padding:1rem;margin-bottom:.75rem}
-.team-port-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
-.team-port-name{font-size:14px;font-weight:700;color:var(--txt)}
-.team-port-stats{display:flex;gap:10px}
-.team-port-stat{text-align:right}
-.team-port-stat-l{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
-.team-port-stat-v{font-size:13px;font-weight:700;color:var(--txt)}
+body{background:#0a0a0f;font-family:monospace;color:#e2e8f0}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:#0a0a0f}
+::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
+select option{background:#0f172a;color:#e2e8f0}
 </style>
 </head>
 <body>
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useCallback,useEffect,useRef}=React;
 
-<div id="loadingOverlay">
-  <div class="spinner"></div>
-  <div style="color:var(--txt2);font-size:14px;font-weight:500">Connecting to server…</div>
-</div>
+const initials=n=>n.split(" ").map(w=>w[0]).join("").slice(0,2);
+const COLORS=["#8b5cf6","#06b6d4","#f59e0b","#ec4899","#22c55e","#3b82f6","#ef4444","#14b8a6","#f97316","#6366f1","#84cc16","#e879f9","#fb7185","#38bdf8","#a3e635"];
+function netWorth(team,commodities){
+  return team.cash+Object.entries(team.holdings).reduce((s,[id,qty])=>{
+    const c=commodities.find(x=>x.id===id);return s+qty*(c?c.price:0);
+  },0);
+}
+const ts=()=>new Date().toLocaleTimeString();
 
-<div id="loginScreen" class="screen">
-  <div class="login-wrap"><div class="login-card">
-    <div class="login-logo"><div class="ico">💰</div><h1>Paisa Bolta Hai</h1><p>Financial Literacy Game for Schools & Colleges</p></div>
-    <div class="login-tabs" id="loginTabs">
-      <button class="ltab on" onclick="setLTab('admin',0)">🛡 Admin</button>
-      <button class="ltab" onclick="setLTab('station',1)">🏦 Station</button>
-      <button class="ltab" onclick="setLTab('team',2)">👥 Team</button>
+const INIT_COMMODITIES=[
+  {id:"food",name:"Food",icon:"🌾",color:"#22c55e",price:500},
+  {id:"tech",name:"Tech",icon:"💻",color:"#3b82f6",price:1200},
+  {id:"energy",name:"Energy",icon:"⚡",color:"#eab308",price:800},
+  {id:"metals",name:"Metals",icon:"⛏️",color:"#94a3b8",price:650},
+  {id:"medicine",name:"Medicine",icon:"💊",color:"#ec4899",price:950},
+];
+const INIT_SCENARIOS=[
+  {id:"s1",name:"Solar Surge",desc:"Solar energy floods the grid.",effects:{food:1.05,tech:0.95,energy:1.4,metals:1.0,medicine:1.0}},
+  {id:"s2",name:"Energy Crisis",desc:"Fuel shortages hit the colony hard.",effects:{food:1.2,tech:0.9,energy:1.8,metals:0.95,medicine:1.1}},
+  {id:"s3",name:"Tech Boom",desc:"Innovation wave boosts tech sector.",effects:{food:1.0,tech:1.6,energy:1.1,metals:1.2,medicine:0.9}},
+  {id:"s4",name:"Food Shortage",desc:"Crop blight devastates food supply.",effects:{food:2.0,tech:0.95,energy:1.0,metals:1.0,medicine:1.3}},
+  {id:"s5",name:"Meteor Strike",desc:"Rich ore deposits discovered!",effects:{food:1.1,tech:1.0,energy:0.8,metals:1.9,medicine:1.0}},
+];
+const INIT_SALARIES=[3000,1000,1000,0,1000];
+const TEAM_NAMES=["Nova Squad","Iron Wolves","Quantum Crew","Stellar Five","Red Comet","Dark Matter","Void Runners","Nebula Six","Orbit Team","Blaze Unit","Cosmic Nine","Titan Force","Zero Gravity","Warp Drive","Solar Flare"];
+
+function makeTeams(commodities){
+  return TEAM_NAMES.map((name,i)=>({
+    id:`t${i}`,name,color:COLORS[i%COLORS.length],
+    cash:6000,holdings:Object.fromEntries(commodities.map(c=>[c.id,0])),transactions:[],
+  }));
+}
+
+// ── UI atoms ──
+function Btn({children,onClick,color="#4c1d95",border="#7c3aed",textColor="#e2e8f0",style={},disabled=false}){
+  return <button onClick={onClick} disabled={disabled} style={{background:disabled?"#1e293b":color,border:`1px solid ${disabled?"#334155":border}`,color:disabled?"#475569":textColor,padding:"8px 14px",borderRadius:8,cursor:disabled?"not-allowed":"pointer",fontFamily:"monospace",fontSize:13,letterSpacing:.5,...style}}>{children}</button>;
+}
+function Input({value,onChange,placeholder,type="text",style={}}){
+  return <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={{padding:"8px 10px",background:"#0f172a",border:"1px solid #1e293b",borderRadius:8,color:"#e2e8f0",fontFamily:"monospace",fontSize:13,outline:"none",...style}}/>;
+}
+function Card({children,style={}}){
+  return <div style={{background:"#111118",border:"1px solid #1e293b",borderRadius:12,padding:"1.25rem",...style}}>{children}</div>;
+}
+function SectionLabel({children}){
+  return <p style={{color:"#475569",fontSize:10,letterSpacing:1.5,margin:"0 0 10px",textTransform:"uppercase"}}>{children}</p>;
+}
+function Avatar({name,color,size=36}){
+  return <div style={{width:size,height:size,borderRadius:"50%",background:color+"33",border:`2px solid ${color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size>40?13:10,fontWeight:700,color,flexShrink:0}}>{initials(name)}</div>;
+}
+function PriceBadge({c}){
+  return(
+    <div style={{background:"#0f172a",borderRadius:8,padding:"10px 8px",textAlign:"center",border:`1px solid ${c.color}33`}}>
+      <div style={{fontSize:20}}>{c.icon}</div>
+      <div style={{fontSize:11,color:"#64748b",margin:"2px 0"}}>{c.name}</div>
+      <div style={{fontSize:14,fontWeight:700,color:c.color}}>🪙 {c.price.toLocaleString()}</div>
     </div>
-    <div id="loginForm"></div>
-  </div></div>
-</div>
-
-<div id="adminScreen" class="screen">
-  <div class="topbar">
-    <span class="topbar-logo">💰 Paisa Bolta Hai</span>
-    <div class="topbar-r">
-      <span class="sync-dot" id="dot"></span>
-      <span id="aRndBadge" class="badge badge-a"></span>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Exit</button>
-    </div>
-  </div>
-  <div class="main">
-    <div class="nav-tabs" id="adminTabs">
-      <button class="ntab on" onclick="aTab('dashboard',0)">📊 Dashboard</button>
-      <button class="ntab" onclick="aTab('teams',1)">👥 Teams</button>
-      <button class="ntab" onclick="aTab('stations',2)">🏦 Stations</button>
-      <button class="ntab" onclick="aTab('rounds',3)">🎯 Rounds</button>
-      <button class="ntab" onclick="aTab('settings',4)">⚙️ Settings</button>
-    </div>
-    <div id="adminContent"></div>
-  </div>
-</div>
-
-<div id="stationScreen" class="screen">
-  <div class="topbar">
-    <span class="topbar-logo">💰 Paisa Bolta Hai</span>
-    <div class="topbar-r">
-      <span class="sync-dot" id="dotSt"></span>
-      <span id="stBadge" class="badge badge-b"></span>
-      <span id="stRnd" class="badge badge-a"></span>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Exit</button>
-    </div>
-  </div>
-  <div class="main" id="stationContent"></div>
-</div>
-
-<div id="teamScreen" class="screen">
-  <div class="topbar">
-    <span class="topbar-logo">💰 Paisa Bolta Hai</span>
-    <div class="topbar-r">
-      <span class="sync-dot" id="dotTm"></span>
-      <span id="tmBadge" class="badge badge-p"></span>
-      <span id="tmRnd" class="badge badge-a"></span>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Exit</button>
-    </div>
-  </div>
-  <div class="main" id="teamContent"></div>
-</div>
-
-<div id="modalRoot"></div>
-
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const SB_URL = 'https://qedwngdfnbphaytmtbzn.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlZHduZ2RmbmJwaGF5dG10YnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Njc4MzgsImV4cCI6MjA5MjI0MzgzOH0.LyaJl2ncc0Z1C7-buiFPtnJZm-L-K9x1LDzkuNzdj5I';
-const sb = createClient(SB_URL, SB_KEY);
-
-const SC = {
-  'Education':          {c:'#4DA8FF',bg:'rgba(77,168,255,.14)',  i:'📚'},
-  'Insurance':          {c:'#00D68A',bg:'rgba(0,214,138,.14)',   i:'🛡️'},
-  'Stocks/Mutual Funds':{c:'#A374FF',bg:'rgba(163,116,255,.14)', i:'📈'},
-  'Real Estate':        {c:'#FF7A5C',bg:'rgba(255,122,92,.14)',  i:'🏠'},
-  'Fixed Deposits':     {c:'#FFB830',bg:'rgba(255,184,48,.14)',  i:'🏦'},
-  'Business':           {c:'#FF6EC7',bg:'rgba(255,110,199,.14)', i:'💼'},
-  'Gold/Commodities':   {c:'#FFD700',bg:'rgba(255,215,0,.14)',   i:'🥇'},
-  'Cryptocurrency':     {c:'#9B6DFF',bg:'rgba(155,109,255,.14)', i:'₿'},
-};
-const STOCK_COLORS = ['#00D68A','#4DA8FF','#A374FF','#FFB830','#FF7A5C','#FF6EC7','#00E5CC'];
-
-let DB = { game:{}, teams:[], stations:[], scenarios:[], transactions:[], portfolio:[], stocks:[] };
-let user = null;
-let curATab = 'dashboard';
-let selectedStockId = null;
-let adminTeamTab = null;
-let adminStTab   = null;
-let settingsTab  = 'game';
-let tmTab        = 'home';
-let stTab        = 'invest'; // station sub-tab: 'invest' | 'teams'
-
-const fmt  = n => '₹' + Math.round(n).toLocaleString('en-IN');
-const fpc  = n => (n > 0 ? '+' : '') + n + '%';
-const uid  = () => Math.random().toString(36).slice(2,10);
-const setDot = ok => document.querySelectorAll('.sync-dot').forEach(d => d.classList.toggle('off',!ok));
-const teamNetWorth = t => t.bal + DB.portfolio.filter(p=>p.team_id===t.id).reduce((s,p)=>s+p.amount,0);
-const teamInvested = tid => DB.portfolio.filter(p=>p.team_id===tid).reduce((s,p)=>s+p.amount,0);
-
-// ── LOAD ──
-async function loadAll() {
-  try {
-    const [g,teams,stations,scenarios,txs,port,stocks] = await Promise.all([
-      sb.from('game').select('*').eq('id','main').single(),
-      sb.from('teams').select('*').order('created_at'),
-      sb.from('stations').select('*').order('id'),
-      sb.from('scenarios').select('*').order('round_order'),
-      sb.from('transactions').select('*').order('ts',{ascending:false}).limit(300),
-      sb.from('portfolio').select('*'),
-      sb.from('stocks').select('*').order('id'),
-    ]);
-    if (g.error) throw g.error;
-    DB.game=g.data; DB.teams=teams.data||[]; DB.stations=stations.data||[];
-    DB.scenarios=scenarios.data||[]; DB.transactions=txs.data||[];
-    DB.portfolio=port.data||[]; DB.stocks=stocks.data||[];
-    if (!selectedStockId && DB.stocks.length) selectedStockId=DB.stocks[0].id;
-    if (!adminTeamTab && DB.teams.length) adminTeamTab=DB.teams[0].id;
-    if (!adminStTab && DB.stations.length) adminStTab=DB.stations[0].id;
-    setDot(true); return true;
-  } catch(e) { console.error(e); setDot(false); return false; }
+  );
+}
+function TxBadge({type}){
+  const map={buy:["#052e16","#86efac"],sell:["#1e1b4b","#c4b5fd"],salary:["#1c1917","#fbbf24"],bonus:["#052e16","#86efac"],penalty:["#450a0a","#fca5a5"],deduction:["#450a0a","#fca5a5"],adjustment:["#172554","#93c5fd"]};
+  const[bg,fg]=map[type]||["#1e293b","#94a3b8"];
+  return <span style={{fontSize:10,padding:"2px 6px",borderRadius:4,background:bg,color:fg}}>{type.toUpperCase()}</span>;
+}
+function Sparkline({data,color,width=180,height=60}){
+  if(!data||data.length<2)return <div style={{color:"#334155",fontSize:11,padding:"1rem"}}>Not enough data yet.</div>;
+  const min=Math.min(...data),max=Math.max(...data),range=max-min||1;
+  const pts=data.map((v,i)=>{
+    const x=(i/(data.length-1))*width;
+    const y=height-((v-min)/range)*(height-8)-4;
+    return `${x},${y}`;
+  }).join(" ");
+  return(
+    <svg width={width} height={height} style={{overflow:"visible"}}>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round"/>
+      {data.map((v,i)=>{
+        const x=(i/(data.length-1))*width;
+        const y=height-((v-min)/range)*(height-8)-4;
+        return <circle key={i} cx={x} cy={y} r={3} fill={color}/>;
+      })}
+    </svg>
+  );
 }
 
-function subscribeAll() {
-  ['game','teams','stations','scenarios','transactions','portfolio','stocks','round_history'].forEach(tbl => {
-    sb.channel('rt_'+tbl).on('postgres_changes',{event:'*',schema:'public',table:tbl},async()=>{
-      await loadAll(); rerenderCurrent();
-    }).subscribe(s=>{ if(s==='SUBSCRIBED') setDot(true); });
-  });
-}
-function rerenderCurrent() {
-  if (!user) return;
-  if (user.role==='admin')   renderAdmin(curATab);
-  if (user.role==='station') renderSt();
-  if (user.role==='team')    renderTmInner();
-}
-
-async function boot() {
-  try { const s=sessionStorage.getItem('pbh_user'); if(s) user=JSON.parse(s); } catch(e){}
-  const ok = await loadAll();
-  if (!ok) {
-    document.getElementById('loadingOverlay').innerHTML=`<div style="color:#FF4D4D;text-align:center;padding:2rem;font-size:15px;font-weight:600">❌ Cannot connect to Supabase<br><span style="font-size:13px;color:#8888AA;font-weight:400;margin-top:8px;display:block">Check your URL, anon key, and that RLS is disabled.</span></div>`;
-    return;
-  }
-  subscribeAll();
-  document.getElementById('loadingOverlay').style.display='none';
-  user ? showSc(user.role) : showSc('login');
-}
-
-// ── LOGIN ──
-let lTab='admin';
-window.setLTab=(tab,i)=>{ lTab=tab; document.querySelectorAll('.ltab').forEach((b,j)=>b.classList.toggle('on',j===i)); renderLF(); };
-function renderLF() {
-  const f=document.getElementById('loginForm');
-  if (lTab==='admin') {
-    f.innerHTML=`<div class="field"><label>Admin PIN</label><input type="password" id="pin" placeholder="Enter PIN"/></div>
-    <button class="btn btn-primary btn-full" onclick="doLogin('admin')">Enter as Admin →</button><p class="err" id="le"></p>`;
-  } else if (lTab==='station') {
-    const o=DB.stations.filter(s=>s.active).map(s=>`<option value="${s.id}">${(SC[s.name]||{i:'💰'}).i} ${s.name}</option>`).join('');
-    f.innerHTML=`<div class="field"><label>Station</label><select id="stSel">${o}</select></div>
-    <div class="field"><label>PIN</label><input type="password" id="pin" placeholder="Enter PIN"/></div>
-    <button class="btn btn-primary btn-full" onclick="doLogin('station')">Enter as Mentor →</button><p class="err" id="le"></p>`;
-  } else {
-    const o=DB.teams.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
-    f.innerHTML=`<div class="field"><label>Team</label><select id="tmSel">${o}</select></div>
-    <div class="field"><label>PIN</label><input type="password" id="pin" placeholder="Enter PIN"/></div>
-    <button class="btn btn-primary btn-full" onclick="doLogin('team')">Enter as Team →</button><p class="err" id="le"></p>`;
-  }
-}
-window.doLogin=role=>{
-  const pin=document.getElementById('pin').value;
-  if (role==='admin') {
-    if (pin!==DB.game.admin_pin){document.getElementById('le').textContent='Wrong PIN';return;}
-    user={role:'admin'};
-  } else if (role==='station') {
-    const sid=document.getElementById('stSel').value;
-    const st=DB.stations.find(s=>s.id===sid);
-    if (!st||pin!==st.pin){document.getElementById('le').textContent='Wrong PIN';return;}
-    user={role:'station',sid};
-  } else {
-    const tid=document.getElementById('tmSel').value;
-    const tm=DB.teams.find(t=>t.id===tid);
-    if (!tm||pin!==tm.pin){document.getElementById('le').textContent='Wrong PIN';return;}
-    user={role:'team',tid};
-  }
-  sessionStorage.setItem('pbh_user',JSON.stringify(user));
-  showSc(role);
-};
-window.logout=()=>{ user=null; sessionStorage.removeItem('pbh_user'); showSc('login'); };
-function showSc(r) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById(r==='login'?'loginScreen':r+'Screen').classList.add('on');
-  if (r==='login'){renderLF();return;}
-  if (r==='admin')   renderAdmin('dashboard');
-  if (r==='station') renderSt();
-  if (r==='team')    renderTm();
-}
-
-// ══════════════════════════════════════════
-// ADMIN
-// ══════════════════════════════════════════
-window.aTab=(tab,i)=>{
-  curATab=tab;
-  document.querySelectorAll('#adminTabs .ntab').forEach((b,j)=>b.classList.toggle('on',j===i));
-  renderAdmin(tab);
-};
-function renderAdmin(tab) {
-  const rb=DB.game.status==='active'?`Round ${DB.game.cur_round}/${DB.game.total_rounds}`:DB.game.status==='setup'?'Setup':'Game Over';
-  document.getElementById('aRndBadge').textContent=rb;
-  const c=document.getElementById('adminContent');
-  if (tab==='dashboard') { loadAll().then(()=>{ c.innerHTML=raDash(); }); return; }
-  if (tab==='teams')     { c.innerHTML=raTeams(); renderAdminTeamDetail(adminTeamTab); }
-  if (tab==='stations')  { c.innerHTML=raSt();    renderAdminStDetail(adminStTab); }
-  if (tab==='rounds')    { c.innerHTML=raRounds(); }
-  if (tab==='settings')  { c.innerHTML=raSettings(); renderSettingsTab(settingsTab); }
-}
-
-// ── DASHBOARD ──
-function miniBar(teams) {
-  const vals=teams.map(t=>teamNetWorth(t)),max=Math.max(...vals,1);
-  const colors=['#F5A623','#9B6DFF','#4D9FFF','#FF6B4D','#00C97F','#FF4D9B','#FFD700'];
-  return `<div class="bar-chart">${teams.map((t,i)=>{
-    const h=Math.round((vals[i]/max)*58);
-    return `<div class="bar-col"><div class="bar-inner" style="height:${h}px;background:${colors[i%colors.length]}"></div><div class="bar-label">${t.name.split(' ')[0]}</div></div>`;
-  }).join('')}</div>`;
-}
-function raDash() {
-  const sorted=[...DB.teams].sort((a,b)=>teamNetWorth(b)-teamNetWorth(a));
-  const totalInv=DB.portfolio.reduce((s,p)=>s+p.amount,0);
-  const sc=DB.scenarios[DB.game.cur_round-1];
-  const g=DB.game;
-  const lb=sorted.map((t,i)=>{
-    const n=teamNetWorth(t),d=n-g.start_bal;
-    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
-    return `<div class="lb-row"><span class="lb-rk">${medal}</span>
-      <div class="lb-info"><div class="lb-nm">${t.name}${t.insured?' 🛡️':''}</div>
-      <div class="lb-sub">${fmt(t.bal)} cash · ${fmt(teamInvested(t.id))} invested</div></div>
-      <div class="lb-val">      <div class="lb-v">${fmt(n)}</div>
-      <div class="lb-ch" style="color:${d>=0?'#00D68A':'#FF5252'};font-size:12px">${d>=0?'+':''}${fmt(d)}</div></div></div>`;
-  }).join('');
-  const recent=DB.transactions.slice(0,6);
-  const txH=recent.map(tx=>{
-    const s=SC[tx.station_name]||{bg:'rgba(255,255,255,.08)',i:'💰'};
-    const tm=DB.teams.find(t=>t.id===tx.team_id);
-    return `<div class="tx-row"><div class="tx-ic" style="background:${s.bg}">${s.i}</div>
-      <div class="tx-in"><div class="tx-nm">${tm?.name||'?'} · ${tx.station_name}</div><div class="tx-ti">${new Date(tx.ts).toLocaleTimeString()}</div></div>
-      <div class="tx-am ${tx.amount<0?'neg':'pos'}">${tx.amount<0?'':'+'}${fmt(Math.abs(tx.amount))}</div></div>`;
-  }).join('')||'<div class="empty">No transactions yet</div>';
-  const scCard=sc?`<div class="sc-card">
-    <div class="label" style="margin-bottom:6px;color:#00D68A">Round ${g.cur_round} Active Scenario</div>
-    <div class="sc-card-title">${sc.name}</div><div class="sc-card-desc">${sc.description}</div>
-    <div class="sc-effects">${Object.entries(sc.effects||{}).map(([k,v])=>`<span class="sc-eff ${v>0?'pos':v<0?'neg':'neu'}">${k}: ${fpc(v)}</span>`).join('')}</div>
-    ${sc.forced_amt?`<div class="sc-forced">⚠️ ${sc.forced_desc}</div>`:''}
-  </div>`:'';
-  return `
-    <div class="g4">
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(0,214,138,.1),transparent)"><div class="stat-ico">👥</div><div class="stat-l">Teams</div><div class="stat-v">${DB.teams.length}</div></div>
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(255,184,48,.1),transparent)"><div class="stat-ico">🎯</div><div class="stat-l">Round</div><div class="stat-v">${g.cur_round||'—'}<span style="font-size:15px;color:var(--txt2)"> / ${g.total_rounds}</span></div></div>
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(77,168,255,.1),transparent)"><div class="stat-ico">💸</div><div class="stat-l">Total Invested</div><div class="stat-v" style="font-size:17px">${fmt(totalInv)}</div></div>
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(163,116,255,.1),transparent)"><div class="stat-ico">🎮</div><div class="stat-l">Status</div><div class="stat-v" style="font-size:16px;text-transform:capitalize">${g.status}</div></div>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:1rem">
-      ${g.status==='setup'?`<button class="btn btn-primary" onclick="startGame()">▶ Start Game</button>`:''}
-      ${g.status==='active'?`<button class="btn btn-primary" onclick="endRound()">✅ End Round ${g.cur_round}</button>`:''}
-      ${g.status==='active'&&g.cur_round<g.total_rounds?`<button class="btn btn-ghost" onclick="nextRound()">Next Round →</button>`:''}
-      ${g.status==='ended'?`<span class="badge badge-g" style="font-size:13px;padding:8px 14px">🏆 Game Over!</span><button class="btn btn-amber" onclick="resetGame()">↺ Reset</button>`:''}
-      ${g.status==='active'?`<button class="btn btn-danger" onclick="resetGame()">↺ Reset</button>`:''}
-    </div>
-    ${scCard}
-    <div class="g2">
-      <div class="sec"><div class="sec-h"><span class="sec-t">🏆 Leaderboard</span></div>${miniBar(sorted)}${lb}</div>
-      <div class="sec"><div class="sec-h"><span class="sec-t">⚡ Recent Transactions</span></div>${txH}</div>
-    </div>
-    <div class="sec"><div class="sec-h"><span class="sec-t">📈 Stock Market</span></div>${stockChartUI(true)}</div>`;
-}
-
-// ── ADMIN TEAMS TAB ──
-function raTeams() {
-  if (!adminTeamTab && DB.teams.length) adminTeamTab=DB.teams[0].id;
-  const pills=DB.teams.map(t=>`<button class="sub-tab ${adminTeamTab===t.id?'on':''}" onclick="switchAdminTeamTab('${t.id}')">${t.name}</button>`).join('');
-  return `<div style="font-size:17px;font-weight:700;margin-bottom:1rem">👥 Teams</div>
-    <div class="sub-tabs">${pills||'<span style="color:var(--txt2);font-size:14px">No teams — add them in ⚙️ Settings</span>'}</div>
-    <div id="admTeamDetail"></div>`;
-}
-window.switchAdminTeamTab=id=>{
-  adminTeamTab=id;
-  document.querySelectorAll('.sub-tab').forEach(b=>{
-    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes('switchAdminTeamTab'))
-      b.classList.toggle('on',b.getAttribute('onclick').includes(`'${id}'`));
-  });
-  renderAdminTeamDetail(id);
-};
-function renderAdminTeamDetail(tid) {
-  const c=document.getElementById('admTeamDetail'); if(!c) return;
-  const t=DB.teams.find(x=>x.id===tid); if(!t){c.innerHTML='';return;}
-  const port=DB.portfolio.filter(p=>p.team_id===tid);
-  const tot=port.reduce((s,p)=>s+p.amount,0);
-  const n=teamNetWorth(t),d=n-DB.game.start_bal;
-  const portRows=port.length?port.map(p=>{
-    const s=SC[p.station_name]||{i:'💰',c:'#888',bg:'rgba(255,255,255,.08)'};
-    const pc=tot>0?Math.round(p.amount/tot*100):0;
-    const tags=DB.transactions.filter(tx=>tx.team_id===tid&&tx.station_name===p.station_name&&tx.tag).map(tx=>`<span style="font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 7px;color:var(--txt2)">${tx.tag}</span>`).join(' ');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div style="width:32px;height:32px;border-radius:9px;background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${s.i}</div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px">${p.station_name} ${tags}</div>
-        <div style="height:6px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="width:${pc}%;height:100%;background:${s.c};border-radius:4px"></div></div></div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:13px;font-weight:700;color:${s.c}">${fmt(p.amount)}</div><div style="font-size:11px;color:var(--txt2)">${pc}%</div></div>
-    </div>`;
-  }).join(''):`<div class="empty" style="padding:1rem">No investments yet</div>`;
-  const myTxs=DB.transactions.filter(tx=>tx.team_id===tid).slice(0,8);
-  const txH=myTxs.map(tx=>{
-    const s=SC[tx.station_name]||{i:'💰',bg:'rgba(255,255,255,.08)'};
-    const lbl=tx.type==='invest'?'Invested':tx.type==='return'?'Return':tx.type==='adjust'?'Adjustment':'Event';
-    const tag=tx.tag?`<span style="font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 7px;margin-left:5px;color:var(--txt2)">${tx.tag}</span>`:'';
-    return `<div class="tx-row"><div class="tx-ic" style="background:${s.bg}">${s.i}</div>
-      <div class="tx-in"><div class="tx-nm">${lbl}: ${tx.station_name}${tag}</div><div class="tx-ti">Round ${tx.round} · ${new Date(tx.ts).toLocaleTimeString()}</div></div>
-      <div class="tx-am ${tx.amount<0?'neg':'pos'}">${tx.amount<0?'':'+'}${fmt(Math.abs(tx.amount))}</div></div>`;
-  }).join('')||'<div class="empty">No transactions yet</div>';
-  c.innerHTML=`
-    <div class="g4">
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(77,168,255,.12),transparent)"><div class="stat-ico">💵</div><div class="stat-l">Cash</div><div class="stat-v" style="font-size:17px">${fmt(t.bal)}</div></div>
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(163,116,255,.12),transparent)"><div class="stat-ico">📊</div><div class="stat-l">Invested</div><div class="stat-v" style="font-size:17px">${fmt(tot)}</div></div>
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(0,214,138,.12),transparent)"><div class="stat-ico">💎</div><div class="stat-l">Net Worth</div><div class="stat-v" style="font-size:17px;color:#00D68A">${fmt(n)}</div>
-        <div class="stat-s" style="color:${d>=0?'#00D68A':'#FF5252'}">${d>=0?'▲':'▼'} ${fmt(Math.abs(d))}</div></div>
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(255,184,48,.12),transparent)"><div class="stat-ico">🛡️</div><div class="stat-l">Insured</div><div class="stat-v" style="font-size:16px">${t.insured?'Yes':'No'}</div></div>
-    </div>
-    <div class="g2">
-      <div class="sec"><div class="sec-h"><span class="sec-t">📊 Portfolio</span></div>${portRows}</div>
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:1rem">💰 Adjust Balance</div>
-        <div class="field"><label>Amount (₹)</label><input type="number" id="adjAmt_${tid}" placeholder="e.g. 5000"/></div>
-        <div class="field"><label>Tag / Reason</label><input type="text" id="adjTag_${tid}" placeholder="e.g. Bonus, Penalty…"/></div>
-        <div style="display:flex;gap:9px;margin-bottom:1.2rem">
-          <button class="btn btn-primary btn-sm" onclick="adjustBalance('${tid}',1)">+ Add Money</button>
-          <button class="btn btn-danger btn-sm" onclick="adjustBalance('${tid}',-1)">− Deduct</button>
-        </div>
-        <div class="sec-t" style="margin-bottom:.85rem;font-size:14px">Recent Transactions</div>${txH}
-      </div>
-    </div>`;
-}
-window.adjustBalance=async(tid,sign)=>{
-  const rawAmt=parseInt(document.getElementById('adjAmt_'+tid).value)||0;
-  const tag=document.getElementById('adjTag_'+tid).value.trim()||'Admin adjustment';
-  if (rawAmt<=0){toast('Enter a valid amount','r');return;}
-  const amt=Math.abs(rawAmt)*sign;
-  const t=DB.teams.find(x=>x.id===tid);
-  await sb.from('teams').update({bal:Math.max(0,t.bal+amt)}).eq('id',tid);
-  await sb.from('transactions').insert({id:uid(),team_id:tid,station_name:'Admin',type:'adjust',amount:amt,tag,round:DB.game.cur_round||0,ts:Date.now()});
-  await loadAll(); renderAdminTeamDetail(tid);
-  toast(`${amt>=0?'Added':'Deducted'} ${fmt(Math.abs(amt))} ${amt>=0?'to':'from'} ${t.name}`);
-};
-
-// ── ADMIN STATIONS TAB ──
-function raSt() {
-  if (!adminStTab && DB.stations.length) adminStTab=DB.stations[0].id;
-  const pills=DB.stations.map(st=>{
-    const s=SC[st.name]||{c:'#888'};
-    const tot=DB.portfolio.filter(p=>p.station_name===st.name).reduce((sum,p)=>sum+p.amount,0);
-    return `<button class="sub-tab ${adminStTab===st.id?'on':''}" style="${adminStTab===st.id?`color:${s.c};background:${s.c}1A;border-color:${s.c}44;`:''}" onclick="switchAdminStTab('${st.id}')">${st.name}${tot>0?` <span style="font-size:11px;opacity:.75">${fmt(tot)}</span>`:''}</button>`;
-  }).join('');
-  return `<div style="font-size:17px;font-weight:700;margin-bottom:1rem">🏦 Stations — Money Flow</div>
-    <div class="sub-tabs" style="flex-wrap:wrap">${pills||'<span style="color:var(--txt2);font-size:14px">No stations — add in ⚙️ Settings</span>'}</div>
-    <div id="admStDetail"></div>`;
-}
-window.switchAdminStTab=id=>{
-  adminStTab=id;
-  document.querySelectorAll('.sub-tab').forEach(b=>{
-    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes('switchAdminStTab')){
-      const on=b.getAttribute('onclick').includes(`'${id}'`);
-      b.classList.toggle('on',on);
-      const st=DB.stations.find(x=>b.getAttribute('onclick').includes(x.id));
-      const sc2=st?SC[st.name]||{c:'#888'}:{c:'#888'};
-      b.style.cssText=on?`color:${sc2.c};background:${sc2.c}1A;border-color:${sc2.c}44;`:'';
-    }
-  });
-  renderAdminStDetail(id);
-};
-function renderAdminStDetail(sid) {
-  const c=document.getElementById('admStDetail'); if(!c) return;
-  const st=DB.stations.find(x=>x.id===sid); if(!st){c.innerHTML='';return;}
-  const s=SC[st.name]||{i:'💰',c:'#888',bg:'rgba(255,255,255,.08)'};
-  const port=DB.portfolio.filter(p=>p.station_name===st.name);
-  const totalHere=port.reduce((sum,p)=>sum+p.amount,0);
-  const teamBreakdown=DB.teams.map(t=>{
-    const p=port.find(x=>x.team_id===t.id);
-    const amt=p?p.amount:0;
-    const pct=totalHere>0?Math.round(amt/totalHere*100):0;
-    const tags=DB.transactions.filter(tx=>tx.team_id===t.id&&tx.station_name===st.name&&tx.tag).map(tx=>`<span style="font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 7px;color:var(--txt2)">${tx.tag}</span>`).join(' ');
-    const txCount=DB.transactions.filter(tx=>tx.team_id===t.id&&tx.station_name===st.name&&tx.type==='invest').length;
-    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;margin-bottom:7px;background:${amt>0?'rgba(255,255,255,.03)':'transparent'};border:1px solid ${amt>0?s.c+'33':'var(--border)'}">
-      <div style="width:11px;height:11px;border-radius:50%;background:${amt>0?s.c:'rgba(255,255,255,.12)'};flex-shrink:0"></div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:3px">${t.name} ${tags}</div>
-        <div style="height:6px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${s.c};border-radius:4px;transition:width .4s"></div></div>
-        <div style="font-size:11px;color:var(--txt2);margin-top:4px">${txCount} transaction${txCount!==1?'s':''} · ${pct}% of total</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:700;color:${amt>0?s.c:'var(--txt2)'}${amt===0?';opacity:.35':''}">${fmt(amt)}</div></div>
-    </div>`;
-  }).join('');
-  c.innerHTML=`
-    <div style="background:${s.bg};border:1px solid ${s.c}33;border-radius:var(--card-r);padding:1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:14px">
-      <div style="font-size:36px">${s.i}</div>
-      <div style="flex:1"><div style="font-size:17px;font-weight:700;color:${s.c}">${st.name}</div>
-        <div style="font-size:13px;color:var(--txt2);margin-top:3px">${st.description} · PIN: ${st.pin} · Base: ${st.base_ret}%/round · ${st.active?'<span style="color:#00C97F">Active</span>':'<span style="color:#FF4D4D">Inactive</span>'}</div>
-        ${(st.subs||[]).length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px">${(st.subs||[]).map(s=>`<span style="font-size:11px;background:rgba(255,255,255,.08);border-radius:5px;padding:2px 8px;color:var(--txt2)">${s}</span>`).join('')}</div>`:''}</div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:20px;font-weight:700;color:${s.c}">${fmt(totalHere)}</div>
-        <div style="font-size:12px;color:var(--txt2);margin-top:2px">${port.length} team${port.length!==1?'s':''} invested</div></div>
-    </div>
-    <div class="sec"><div class="sec-h"><span class="sec-t">Team Breakdown</span><span class="badge badge-g">${fmt(totalHere)} total</span></div>
-      ${teamBreakdown||'<div class="empty">No investments at this station yet</div>'}
-    </div>`;
-}
-
-// ── ROUNDS ──
-function raRounds() {
-  const cards=DB.scenarios.map((sc,i)=>{
-    const done=i<DB.game.cur_round,active=i===DB.game.cur_round-1&&DB.game.status==='active';
-    return `<div class="sec" style="border-color:${done?'rgba(0,201,127,.3)':active?'rgba(245,166,35,.3)':'var(--border)'}">
-      <div class="sec-h"><div style="display:flex;align-items:center;gap:9px"><span class="badge ${done?'badge-g':active?'badge-a':'badge-p'}">Round ${sc.round_order}</span><span class="sec-t">${sc.name}</span></div>
-        <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="openEditSc('${sc.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delSc('${sc.id}')">Del</button></div></div>
-      <p style="font-size:14px;color:var(--txt2);margin-bottom:10px;line-height:1.5">${sc.description}</p>
-      <div class="sc-effects">${Object.entries(sc.effects||{}).map(([k,v])=>`<span class="sc-eff ${v>0?'pos':v<0?'neg':'neu'}">${k}: ${fpc(v)}</span>`).join('')}</div>
-      ${sc.forced_amt?`<div class="sc-forced">⚠️ ${sc.forced_desc} · ${fmt(sc.forced_amt)}</div>`:''}
-    </div>`;
-  }).join('');
-  return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-    <span style="font-size:17px;font-weight:700">🎯 Rounds & Scenarios</span><button class="btn btn-primary btn-sm" onclick="openAddSc()">+ Add Scenario</button></div>${cards}`;
-}
-
-// ── SETTINGS ──
-function raSettings() {
-  return `<div style="font-size:17px;font-weight:700;margin-bottom:1rem">⚙️ Game Settings</div>
-    <div class="sub-tabs">
-      <button class="sub-tab ${settingsTab==='game'?'on':''}" onclick="switchSettingsTab('game')">🎮 Game</button>
-      <button class="sub-tab ${settingsTab==='teams'?'on':''}" onclick="switchSettingsTab('teams')">👥 Teams</button>
-      <button class="sub-tab ${settingsTab==='stations'?'on':''}" onclick="switchSettingsTab('stations')">🏦 Stations</button>
-      <button class="sub-tab ${settingsTab==='stocks'?'on':''}" onclick="switchSettingsTab('stocks')">📈 Stocks</button>
-    </div>
-    <div id="settingsContent"></div>`;
-}
-window.switchSettingsTab=tab=>{
-  settingsTab=tab;
-  document.querySelectorAll('#adminContent .sub-tab').forEach(b=>{
-    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes('switchSettingsTab'))
-      b.classList.toggle('on',b.getAttribute('onclick').includes(`'${tab}'`));
-  });
-  renderSettingsTab(tab);
-};
-function renderSettingsTab(tab) {
-  const c=document.getElementById('settingsContent'); if(!c) return;
-  if (tab==='game') {
-    c.innerHTML=`<div class="sec"><div class="sec-t" style="margin-bottom:1.2rem">🎮 Game Config</div>
-      <div class="field"><label>Game Name</label><input id="sN" value="${DB.game.name}"/></div>
-      <div class="field"><label>Starting Balance (₹)</label><input id="sB" type="number" value="${DB.game.start_bal}"/></div>
-      <div class="field"><label>Admin PIN</label><input id="sP" value="${DB.game.admin_pin}"/></div>
-      <div class="field" style="display:flex;align-items:center;gap:12px"><label class="label" style="margin:0;white-space:nowrap">Total Rounds</label>
-        <input type="number" id="sTR" value="${DB.game.total_rounds}" min="1" max="20" style="width:80px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;font-size:14px;color:var(--txt)"/></div>
-      <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button></div>`;
-  } else if (tab==='teams') {
-    const rows=DB.teams.map(t=>`<tr>
-      <td><strong style="color:var(--txt)">${t.name}</strong></td>
-      <td><code style="background:var(--bg3);padding:3px 8px;border-radius:6px;font-size:13px">${t.pin}</code></td>
-      <td style="color:#4D9FFF">${fmt(t.bal)}</td>
-      <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="openEditTeam('${t.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delTeam('${t.id}')">Del</button></div></td>
-    </tr>`).join('');
-    c.innerHTML=`<div class="sec-h"><span class="sec-t">👥 Manage Teams</span><button class="btn btn-primary btn-sm" onclick="openAddTeam()">+ Add Team</button></div>
-      <div class="sec" style="padding:0;overflow-x:auto"><table><thead><tr><th>Name</th><th>PIN</th><th>Balance</th><th></th></tr></thead>
-      <tbody>${rows||'<tr><td colspan="4" class="empty">No teams yet</td></tr>'}</tbody></table></div>`;
-  } else if (tab==='stations') {
-    const rows=DB.stations.map(s=>{
-      const ico=(SC[s.name]||{i:'💰'}).i,clr=(SC[s.name]||{c:'#888'}).c;
-      return `<tr><td>${ico} <strong style="color:${clr}">${s.name}</strong></td>
-        <td><code style="background:var(--bg3);padding:3px 8px;border-radius:6px;font-size:13px">${s.pin}</code></td>
-        <td><span class="badge badge-g">${s.base_ret}%</span></td>
-        <td style="color:var(--txt2);font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.description}</td>
-        <td><label class="toggle"><input type="checkbox" ${s.active?'checked':''} onchange="toggleSt('${s.id}',this.checked)"><span class="sl"></span></label></td>
-        <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="openEditSt('${s.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delSt('${s.id}')">Del</button></div></td></tr>`;
-    }).join('');
-    c.innerHTML=`<div class="sec-h"><span class="sec-t">🏦 Manage Stations</span><button class="btn btn-primary btn-sm" onclick="openAddSt()">+ Add Station</button></div>
-      <div class="sec" style="padding:0;overflow-x:auto"><table><thead><tr><th>Station</th><th>PIN</th><th>Return</th><th>Description</th><th>Active</th><th></th></tr></thead>
-      <tbody>${rows}</tbody></table></div>`;
-  } else if (tab==='stocks') {
-    const rows=DB.stocks.map(stk=>`<tr>
-      <td><strong style="color:var(--txt)">${stk.name}</strong></td>
-      <td><span class="badge badge-b">${stk.symbol}</span></td>
-      <td style="color:#00C97F;font-weight:700">₹${stk.prices[stk.prices.length-1]}</td>
-      <td style="color:var(--txt2);font-size:13px">Started ₹${stk.prices[0]}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="delStock('${stk.id}')">Remove</button></td>
-    </tr>`).join('');
-    c.innerHTML=`<div class="sec-h"><span class="sec-t">📈 Manage Stocks</span><button class="btn btn-primary btn-sm" onclick="openAddStock()">+ Add Stock</button></div>
-      <div class="sec" style="padding:0;overflow-x:auto"><table><thead><tr><th>Name</th><th>Symbol</th><th>Current</th><th>Start</th><th></th></tr></thead>
-      <tbody>${rows||'<tr><td colspan="5" class="empty">No stocks yet</td></tr>'}</tbody></table></div>`;
-  }
-}
-
-// ── GAME ACTIONS ──
-window.startGame=async()=>{
-  if (!DB.teams.length){toast('Add at least one team!','r');return;}
-  for (const t of DB.teams) await sb.from('teams').update({bal:DB.game.start_bal,insured:false}).eq('id',t.id);
-  await sb.from('portfolio').delete().neq('id','x');
-  await sb.from('transactions').delete().neq('id','x');
-  await sb.from('round_history').delete().neq('id','x');
-  for (const stk of DB.stocks) await sb.from('stocks').update({prices:[stk.prices[0]??100]}).eq('id',stk.id);
-  await sb.from('game').update({status:'active',cur_round:1,updated_at:new Date()}).eq('id','main');
-  await loadAll(); renderAdmin('dashboard');
-};
-window.endRound=async()=>{
-  const sc=DB.scenarios[DB.game.cur_round-1];
-  if (!sc){toast('No scenario configured for this round!','r');return;}
-  if (!confirm(`Apply returns for Round ${DB.game.cur_round}: "${sc.name}"?`)) return;
-  for (const t of DB.teams) {
-    const port=DB.portfolio.filter(p=>p.team_id===t.id);
-    let newBal=t.bal;
-    for (const p of port) {
-      const ret=(sc.effects||{})[p.station_name]??0,gain=Math.round(p.amount*ret/100);
-      newBal+=gain;
-      if (gain!==0) await sb.from('transactions').insert({id:uid(),team_id:t.id,station_name:p.station_name,type:'return',amount:gain,round:DB.game.cur_round,ts:Date.now()});
-    }
-    if (sc.forced_amt&&(!sc.forced_uninsured||!t.insured)){
-      newBal=Math.max(0,newBal-sc.forced_amt);
-      await sb.from('transactions').insert({id:uid(),team_id:t.id,station_name:'Event',type:'forced',amount:-sc.forced_amt,round:DB.game.cur_round,ts:Date.now()});
-    }
-    await sb.from('teams').update({bal:newBal}).eq('id',t.id);
-  }
-  await sb.from('round_history').insert({id:uid(),round:DB.game.cur_round,scenario_name:sc.name});
-  const newStatus=DB.game.cur_round>=DB.game.total_rounds?'ended':'active';
-  await sb.from('game').update({status:newStatus,updated_at:new Date()}).eq('id','main');
-  await loadAll(); renderAdmin('dashboard');
-};
-window.nextRound=async()=>{
-  if (!confirm('Start next round? Portfolios carry over.')) return;
-  await sb.from('game').update({cur_round:DB.game.cur_round+1,updated_at:new Date()}).eq('id','main');
-  await loadAll(); renderAdmin('dashboard');
-};
-window.resetGame=async()=>{
-  if (!confirm('Reset entire game? All progress will be lost.')) return;
-  for (const t of DB.teams) await sb.from('teams').update({bal:DB.game.start_bal,insured:false}).eq('id',t.id);
-  await sb.from('portfolio').delete().neq('id','x');
-  await sb.from('transactions').delete().neq('id','x');
-  await sb.from('round_history').delete().neq('id','x');
-  for (const stk of DB.stocks) await sb.from('stocks').update({prices:[stk.prices[0]??100]}).eq('id',stk.id);
-  await sb.from('game').update({status:'setup',cur_round:0,updated_at:new Date()}).eq('id','main');
-  await loadAll(); renderAdmin('dashboard');
-};
-window.saveSettings=async()=>{
-  await sb.from('game').update({name:document.getElementById('sN').value,start_bal:parseInt(document.getElementById('sB').value)||500000,admin_pin:document.getElementById('sP').value,total_rounds:parseInt(document.getElementById('sTR').value)||4}).eq('id','main');
-  await loadAll(); toast('Settings saved!');
-};
-
-// ── TEAM CRUD ──
-window.openAddTeam=()=>modal(`<div class="modal-t">Add Team</div>
-  <div class="field"><label>Team Name</label><input id="mN" placeholder="e.g. Alpha Tigers"/></div>
-  <div class="field"><label>PIN</label><input id="mP" placeholder="4-digit PIN"/></div>
-  <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveTeam()">Add Team</button></div>`);
-window.saveTeam=async()=>{
-  const n=document.getElementById('mN').value.trim(),p=document.getElementById('mP').value.trim();
-  if (!n||!p) return;
-  await sb.from('teams').insert({id:'t'+uid(),name:n,pin:p,bal:DB.game.start_bal,insured:false});
-  closeModal(); await loadAll(); renderSettingsTab('teams');
-};
-window.openEditTeam=id=>{
-  const t=DB.teams.find(x=>x.id===id);
-  modal(`<div class="modal-t">Edit: ${t.name}</div>
-    <div class="field"><label>Name</label><input id="mN" value="${t.name}"/></div>
-    <div class="field"><label>PIN</label><input id="mP" value="${t.pin}"/></div>
-    <div class="field"><label>Cash (₹)</label><input id="mB" type="number" value="${t.bal}"/></div>
-    <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="upTeam('${id}')">Save</button></div>`);
-};
-window.upTeam=async id=>{
-  await sb.from('teams').update({name:document.getElementById('mN').value,pin:document.getElementById('mP').value,bal:parseInt(document.getElementById('mB').value)||0}).eq('id',id);
-  closeModal(); await loadAll(); renderAdmin(curATab);
-};
-window.delTeam=async id=>{
-  if (!confirm('Delete this team?')) return;
-  await sb.from('teams').delete().eq('id',id);
-  adminTeamTab=null; await loadAll(); renderAdmin(curATab);
-};
-
-// ── STATION CRUD ──
-window.openAddSt=()=>modal(`<div class="modal-t">Add Station</div>
-  <div class="field"><label>Name</label><input id="mN"/></div>
-  <div class="field"><label>PIN</label><input id="mP"/></div>
-  <div class="field"><label>Base Return (%)</label><input id="mR" type="number" value="8"/></div>
-  <div class="field"><label>Description</label><input id="mD"/></div>
-  <div class="field"><label>Sub-categories <span style="color:var(--txt2);font-weight:400;font-size:11px;text-transform:none">(comma separated)</span></label>
-    <input id="mSubs" placeholder="e.g. School Fees, College Degree, MBA"/></div>
-  <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveSt()">Add Station</button></div>`);
-window.saveSt=async()=>{
-  const n=document.getElementById('mN').value.trim(),p=document.getElementById('mP').value.trim();
-  if (!n||!p) return;
-  const subs=document.getElementById('mSubs').value.split(',').map(s=>s.trim()).filter(Boolean);
-  await sb.from('stations').insert({id:'st'+uid(),name:n,pin:p,base_ret:parseInt(document.getElementById('mR').value)||0,description:document.getElementById('mD').value,active:true,subs});
-  closeModal(); await loadAll(); renderSettingsTab('stations');
-};
-window.openEditSt=id=>{
-  const s=DB.stations.find(x=>x.id===id);
-  modal(`<div class="modal-t">Edit: ${s.name}</div>
-    <div class="field"><label>Name</label><input id="mN" value="${s.name}"/></div>
-    <div class="field"><label>PIN</label><input id="mP" value="${s.pin}"/></div>
-    <div class="field"><label>Base Return (%)</label><input id="mR" type="number" value="${s.base_ret}"/></div>
-    <div class="field"><label>Description</label><input id="mD" value="${s.description}"/></div>
-    <div class="field"><label>Sub-categories <span style="color:var(--txt2);font-weight:400;font-size:11px;text-transform:none">(comma separated)</span></label>
-      <input id="mSubs" value="${(s.subs||[]).join(', ')}" placeholder="e.g. School Fees, College, MBA"/></div>
-    <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="upSt('${id}')">Save</button></div>`);
-};
-window.upSt=async id=>{
-  const subs=document.getElementById('mSubs').value.split(',').map(s=>s.trim()).filter(Boolean);
-  await sb.from('stations').update({name:document.getElementById('mN').value,pin:document.getElementById('mP').value,base_ret:parseInt(document.getElementById('mR').value)||0,description:document.getElementById('mD').value,subs}).eq('id',id);
-  closeModal(); await loadAll(); renderAdmin(curATab);
-};
-window.toggleSt=async(id,v)=>{ await sb.from('stations').update({active:v}).eq('id',id); await loadAll(); };
-window.delSt=async id=>{
-  if (!confirm('Delete this station?')) return;
-  await sb.from('stations').delete().eq('id',id);
-  adminStTab=null; await loadAll(); renderSettingsTab('stations');
-};
-
-// ── SCENARIO CRUD ──
-function scEffectFields(sc) {
-  return DB.stations.map(s=>`<div class="field"><label>${(SC[s.name]||{i:''}).i} ${s.name} (%)</label>
-    <input id="ef_${s.id}" type="number" value="${sc?(sc.effects||{})[s.name]??s.base_ret:s.base_ret}"/></div>`).join('');
-}
-window.openAddSc=()=>modal(`<div class="modal-t">Add Scenario</div>
-  <div class="field"><label>Name</label><input id="mN" placeholder="e.g. Bull Market 🚀"/></div>
-  <div class="field"><label>Description</label><input id="mD"/></div>
-  <div class="field"><label>Round Order</label><input id="mO" type="number" value="${DB.scenarios.length+1}"/></div>
-  <div class="label" style="margin-bottom:9px">Returns per station (%)</div>${scEffectFields(null)}
-  <div class="label" style="margin:10px 0 9px">Forced Event</div>
-  <div class="field"><label>Amount (₹, 0 = none)</label><input id="mF" type="number" value="0"/></div>
-  <div class="field"><label>Event Description</label><input id="mFD"/></div>
-  <div class="field" style="display:flex;align-items:center;gap:12px"><label class="label" style="margin:0">Uninsured teams only?</label><label class="toggle"><input type="checkbox" id="mU"><span class="sl"></span></label></div>
-  <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveSc()">Add</button></div>`);
-window.saveSc=async()=>{
-  const ef={};DB.stations.forEach(s=>{ef[s.name]=parseInt(document.getElementById('ef_'+s.id).value)||0;});
-  const fa=parseInt(document.getElementById('mF').value)||0;
-  await sb.from('scenarios').insert({id:'sc'+uid(),name:document.getElementById('mN').value,description:document.getElementById('mD').value,round_order:parseInt(document.getElementById('mO').value)||1,effects:ef,forced_amt:fa,forced_desc:document.getElementById('mFD').value,forced_uninsured:document.getElementById('mU').checked});
-  closeModal(); await loadAll(); renderAdmin('rounds');
-};
-window.openEditSc=id=>{
-  const sc=DB.scenarios.find(x=>x.id===id);
-  modal(`<div class="modal-t">Edit: ${sc.name}</div>
-    <div class="field"><label>Name</label><input id="mN" value="${sc.name}"/></div>
-    <div class="field"><label>Description</label><input id="mD" value="${sc.description}"/></div>
-    <div class="field"><label>Round Order</label><input id="mO" type="number" value="${sc.round_order}"/></div>
-    <div class="label" style="margin-bottom:9px">Returns per station (%)</div>${scEffectFields(sc)}
-    <div class="label" style="margin:10px 0 9px">Forced Event</div>
-    <div class="field"><label>Amount (₹)</label><input id="mF" type="number" value="${sc.forced_amt||0}"/></div>
-    <div class="field"><label>Description</label><input id="mFD" value="${sc.forced_desc||''}"/></div>
-    <div class="field" style="display:flex;align-items:center;gap:12px"><label class="label" style="margin:0">Uninsured only?</label><label class="toggle"><input type="checkbox" id="mU" ${sc.forced_uninsured?'checked':''}><span class="sl"></span></label></div>
-    <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="upSc('${id}')">Save</button></div>`);
-};
-window.upSc=async id=>{
-  const ef={};DB.stations.forEach(s=>{ef[s.name]=parseInt(document.getElementById('ef_'+s.id).value)||0;});
-  const fa=parseInt(document.getElementById('mF').value)||0;
-  await sb.from('scenarios').update({name:document.getElementById('mN').value,description:document.getElementById('mD').value,round_order:parseInt(document.getElementById('mO').value)||1,effects:ef,forced_amt:fa,forced_desc:document.getElementById('mFD').value,forced_uninsured:document.getElementById('mU').checked}).eq('id',id);
-  closeModal(); await loadAll(); renderAdmin('rounds');
-};
-window.delSc=async id=>{ if(!confirm('Delete scenario?')) return; await sb.from('scenarios').delete().eq('id',id); await loadAll(); renderAdmin('rounds'); };
-
-// ── STOCK MARKET ──
-window.selectStock=id=>{ selectedStockId=id; rerenderCurrent(); };
-function stockChartUI(isAdmin=false) {
-  const stocks=DB.stocks;
-  if (!stocks.length) return `<div class="empty">No stocks yet${isAdmin?' — add in ⚙️ Settings':''}</div>`;
-  const sel=stocks.find(s=>s.id===selectedStockId)||stocks[0];
-  const prices=sel.prices||[100];
-  const col=STOCK_COLORS[stocks.findIndex(s=>s.id===sel.id)%STOCK_COLORS.length];
-  const pills=stocks.map(s=>{
-    const c=STOCK_COLORS[stocks.findIndex(x=>x.id===s.id)%STOCK_COLORS.length];
-    const on=s.id===sel.id;
-    const last=s.prices[s.prices.length-1],first=s.prices[0];
-    const chg=first>0?(((last-first)/first)*100).toFixed(1):0;
-    return `<button class="stock-pill" style="${on?`background:${c};color:#fff;border-color:${c};`:''}" onclick="selectStock('${s.id}')">${s.symbol} <span style="opacity:.75;font-size:11px">${parseFloat(chg)>=0?'▲':'▼'}${Math.abs(chg)}%</span></button>`;
-  }).join('');
-  const W=500,H=150,pL=44,pB=26,pT=10,pR=16;
-  const cW=W-pL-pR,cH=H-pB-pT;
-  const minP=Math.min(...prices)*.92,maxP=Math.max(...prices)*1.08;
-  const n=prices.length;
-  const xS=i=>pL+(n>1?(i/(n-1))*cW:cW/2);
-  const yS=v=>pT+cH-((v-minP)/(maxP-minP||1))*cH;
-  const pts=prices.map((p,i)=>`${xS(i)},${yS(p)}`).join(' ');
-  const area=`${xS(0)},${H-pB} `+prices.map((p,i)=>`${xS(i)},${yS(p)}`).join(' ')+` ${xS(n-1)},${H-pB}`;
-  const yTicks=[minP,(minP+maxP)/2,maxP].map(v=>`<line x1="${pL}" x2="${W-pR}" y1="${yS(v)}" y2="${yS(v)}" stroke="rgba(255,255,255,.05)" stroke-width="1"/><text x="${pL-5}" y="${yS(v)+4}" text-anchor="end" font-size="10" fill="#9090B8">${Math.round(v)}</text>`).join('');
-  const xTicks=prices.map((_,i)=>`<text x="${xS(i)}" y="${H-7}" text-anchor="middle" font-size="10" fill="#9090B8">R${i+1}</text>`).join('');
-  const dots=prices.map((p,i)=>`<circle cx="${xS(i)}" cy="${yS(p)}" r="4" fill="${col}" stroke="var(--bg2)" stroke-width="2"/>`).join('');
-  const last=prices[prices.length-1],first2=prices[0];
-  const totalChg=first2>0?(((last-first2)/first2)*100).toFixed(1):0;
-  const isUp=parseFloat(totalChg)>=0;
-  const adminControls=isAdmin?`<div style="margin-top:14px;display:flex;align-items:flex-end;gap:9px;flex-wrap:wrap">
-    <div style="flex:1;min-width:130px"><div style="font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:700;text-transform:uppercase">New price for ${sel.symbol}</div>
-      <input type="number" id="newStockPrice" value="${last}" style="width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;font-size:14px;color:var(--txt)"/></div>
-    <button class="btn btn-primary btn-sm" onclick="pushStockPrice('${sel.id}')">Push Update →</button></div>`:'';
-  return `<div class="stock-selector">${pills}</div>
-    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap">
-      <span style="font-size:19px;font-weight:700;color:var(--txt)">${sel.name}</span>
-      <span style="font-size:14px;color:var(--txt2)">${sel.symbol}</span>
-      <span style="font-size:17px;font-weight:700;color:${col}">₹${last}</span>
-      <span style="font-size:13px;color:${isUp?'#00C97F':'#FF4D4D'};font-weight:600">${isUp?'▲':'▼'} ${Math.abs(totalChg)}% overall</span>
-    </div>
-    <svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">
-      <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity=".2"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
-      ${yTicks}${xTicks}
-      <polygon points="${area}" fill="url(#sg)"/>
-      <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-      ${dots}
-    </svg>${adminControls}`;
-}
-window.pushStockPrice=async id=>{
-  const v=parseInt(document.getElementById('newStockPrice').value);
-  if (!v||v<=0){toast('Enter a valid price','r');return;}
-  const stk=DB.stocks.find(s=>s.id===id);
-  await sb.from('stocks').update({prices:[...stk.prices,v]}).eq('id',id);
-  await loadAll(); rerenderCurrent(); toast(`📈 ${stk.symbol} updated to ₹${v}`);
-};
-window.openAddStock=()=>modal(`<div class="modal-t">Add Stock</div>
-  <div class="field"><label>Company Name</label><input id="mN" placeholder="e.g. TechCorp"/></div>
-  <div class="field"><label>Symbol</label><input id="mSym" placeholder="e.g. TCC"/></div>
-  <div class="field"><label>Starting Price (₹)</label><input id="mSP" type="number" value="100"/></div>
-  <div class="modal-a"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveStock()">Add Stock</button></div>`);
-window.saveStock=async()=>{
-  const n=document.getElementById('mN').value.trim(),sym=document.getElementById('mSym').value.trim().toUpperCase();
-  const sp=parseInt(document.getElementById('mSP').value)||100;
-  if (!n||!sym) return;
-  await sb.from('stocks').insert({id:'stk'+uid(),name:n,symbol:sym,prices:[sp]});
-  closeModal(); await loadAll(); rerenderCurrent();
-};
-window.delStock=async id=>{
-  if (!confirm('Remove this stock?')) return;
-  await sb.from('stocks').delete().eq('id',id);
-  await loadAll(); selectedStockId=DB.stocks[0]?.id||null; rerenderCurrent();
-};
-
-// ══════════════════════════════════════════
-// STATION SCREEN — Home + Teams tabs
-// ══════════════════════════════════════════
-function renderSt() {
-  const st=DB.stations.find(s=>s.id===user.sid); if(!st) return;
-  const s=SC[st.name]||{i:'💰',c:'#888',bg:'rgba(255,255,255,.08)'};
-  document.getElementById('stBadge').textContent=st.name;
-  document.getElementById('stRnd').textContent=DB.game.status==='active'?`Round ${DB.game.cur_round}/${DB.game.total_rounds}`:'Waiting';
-  document.getElementById('stationContent').innerHTML=`
-    <div class="station-hero" style="background:${s.bg};border:1px solid ${s.c}33;text-align:center;margin-bottom:0">
-      <div style="font-size:48px;margin-bottom:10px">${s.i}</div>
-      <div style="font-size:22px;font-weight:800;color:${s.c};margin-bottom:4px">${st.name}</div>
-      <div style="font-size:13px;color:var(--txt2);line-height:1.5;margin-bottom:12px">${st.description}</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <span class="badge badge-g">Base: ${st.base_ret}%/round</span>
-        <span class="badge badge-b">Total: ${fmt(DB.portfolio.filter(p=>p.station_name===st.name).reduce((s,p)=>s+p.amount,0))}</span>
-        ${(st.subs||[]).length?`<span class="badge badge-p">${(st.subs||[]).length} sub-categories</span>`:''}
+// ── PIN Login ──
+function PinLogin({title,sub,icon,correctPin,onSuccess,onBack}){
+  const[val,setVal]=useState("");const[err,setErr]=useState("");
+  const attempt=()=>{if(val===correctPin)onSuccess();else{setErr("Incorrect PIN");setVal("");}};
+  return(
+    <div style={{background:"#0a0a0f",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{background:"#111118",border:"1px solid #1e293b",borderRadius:16,padding:"3rem 2.5rem",width:320,textAlign:"center"}}>
+        <div style={{fontSize:40,marginBottom:8}}>{icon}</div>
+        <h2 style={{color:"#a78bfa",margin:"0 0 4px",letterSpacing:2,fontSize:18}}>{title}</h2>
+        <p style={{color:"#475569",fontSize:11,margin:"0 0 2rem"}}>{sub}</p>
+        <Input type="password" value={val} onChange={e=>setVal(e.target.value)} placeholder="Enter PIN" style={{width:"100%",textAlign:"center",fontSize:20,letterSpacing:8}} onKeyDown={e=>e.key==="Enter"&&attempt()}/>
+        {err&&<p style={{color:"#ef4444",fontSize:12,margin:"8px 0 0"}}>{err}</p>}
+        <Btn onClick={attempt} style={{width:"100%",marginTop:16,padding:"10px"}}>ENTER</Btn>
+        <button onClick={onBack} style={{background:"none",border:"none",color:"#475569",cursor:"pointer",fontSize:12,marginTop:12,fontFamily:"monospace"}}>← Back</button>
       </div>
     </div>
-    <div class="nav-tabs" style="margin-top:1.1rem">
-      <button class="ntab st-tab ${stTab==='invest'?'on':''}" onclick="setStTab('invest')">💳 Invest</button>
-      <button class="ntab st-tab ${stTab==='teams'?'on':''}" onclick="setStTab('teams')">👥 Teams</button>
-    </div>
-    <div id="stTabContent"></div>`;
-  renderStTab();
+  );
 }
-window.setStTab=tab=>{
-  stTab=tab;
-  document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick').includes(`'${tab}'`)));
-  renderStTab();
-};
-function renderStTab() {
-  const c=document.getElementById('stTabContent'); if(!c) return;
-  const st=DB.stations.find(s=>s.id===user.sid); if(!st) return;
-  const sc=SC[st.name]||{i:'💰',c:'#888',bg:'rgba(255,255,255,.08)'};
-  if (stTab==='invest') {
-    const tOpts=DB.teams.map(t=>`<option value="${t.id}">${t.name} — ${fmt(t.bal)} cash</option>`).join('');
-    const subs=(st.subs||[]).map(s=>`<option value="${s}">${s}</option>`).join('');
-    const recent=DB.transactions.filter(tx=>tx.station_name===st.name&&tx.type==='invest').slice(0,6);
-    const txH=recent.map(tx=>{
-      const tm=DB.teams.find(t=>t.id===tx.team_id);
-      return `<div class="tx-row"><div class="tx-ic" style="background:${sc.bg}">${sc.i}</div>
-        <div class="tx-in"><div class="tx-nm">${tm?.name||'?'}${tx.tag?` · <span style="font-size:12px;background:var(--bg4);border-radius:5px;padding:2px 7px;color:var(--txt2)">${tx.tag}</span>`:''}</div>
-        <div class="tx-ti">Round ${tx.round} · ${new Date(tx.ts).toLocaleTimeString()}</div></div>
-        <div class="tx-am neg">${fmt(Math.abs(tx.amount))}</div></div>`;
-    }).join('')||'<div class="empty">No investments at this station yet</div>';
-    c.innerHTML=DB.game.status!=='active'?`<div class="sec"><div class="empty" style="padding:2.5rem">⏳ Waiting for admin to start the game</div></div>`:`
-      <div class="sec">
-        <div class="sec-t" style="margin-bottom:1.1rem">Record Investment</div>
-        <div class="field"><label>Team</label><select id="invT">${tOpts}</select></div>
-        <div class="field"><label>Amount (₹)</label><input type="number" id="invA" placeholder="Enter amount to invest"/></div>
-        ${subs?`<div class="field"><label>Sub-category</label><select id="invSub">${subs}<option value="__custom__">Other (type below)…</option></select></div>`:''}
-        <div class="field"><label>Custom tag <span style="color:var(--txt2);font-weight:400;text-transform:none">(optional)</span></label><input type="text" id="invTag" placeholder="e.g. MBA in Finance, Bitcoin SIP…"/></div>
-        ${st.name==='Insurance'?`<div style="background:rgba(0,201,127,.08);border:1px solid rgba(0,201,127,.2);border-radius:11px;padding:12px 14px;margin-bottom:1rem;font-size:13px;color:#00C97F;line-height:1.5">🛡️ Purchasing insurance protects this team from forced event penalties</div>`:''}
-        <button class="btn btn-primary btn-full" style="font-size:15px;padding:13px" onclick="recInv('${st.id}')">Confirm Investment →</button>
-        <p class="err" id="invE"></p>
+
+// ── Team Login ──
+function TeamLogin({teams,onSelect,onBack}){
+  const[sel,setSel]=useState("");
+  return(
+    <div style={{background:"radial-gradient(ellipse at 50% 30%,#0d1f0d,#0a0a0f)",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{background:"#111118",border:"1px solid #166534",borderRadius:20,padding:"3rem 2.5rem",width:360,textAlign:"center",boxShadow:"0 0 40px #22c55e18"}}>
+        <div style={{fontSize:44,marginBottom:10}}>🚀</div>
+        <h2 style={{color:"#86efac",margin:"0 0 4px",letterSpacing:2,fontSize:20}}>TEAM LOGIN</h2>
+        <p style={{color:"#475569",fontSize:12,margin:"0 0 2rem"}}>SELECT YOUR TEAM</p>
+        <select value={sel} onChange={e=>setSel(e.target.value)} style={{width:"100%",padding:"12px",background:"#0f172a",border:"1px solid #1e293b",borderRadius:10,color:sel?"#e2e8f0":"#475569",fontFamily:"monospace",fontSize:14,marginBottom:16}}>
+          <option value="">— Choose your team —</option>
+          {teams.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
+        </select>
+        <Btn onClick={()=>sel&&onSelect(sel)} disabled={!sel} color="#14532d" border="#22c55e" textColor="#86efac" style={{width:"100%",padding:"12px",fontSize:15}}>ENTER DASHBOARD</Btn>
+        <button onClick={onBack} style={{background:"none",border:"none",color:"#475569",cursor:"pointer",fontSize:12,marginTop:16,fontFamily:"monospace"}}>← Back</button>
       </div>
-      <div class="sec"><div class="sec-h"><span class="sec-t">Recent at this Station</span></div>${txH}</div>`;
-  } else {
-    // Teams tab — all teams portfolio in cards
-    const teamCards=DB.teams.map(t=>{
-      const port=DB.portfolio.filter(p=>p.team_id===t.id);
-      const tot=port.reduce((s,p)=>s+p.amount,0);
-      const n=teamNetWorth(t);
-      const portRows=port.map(p=>{
-        const ps=SC[p.station_name]||{i:'💰',c:'#888'};
-        const pc=tot>0?Math.round(p.amount/tot*100):0;
-        const tags=DB.transactions.filter(tx=>tx.team_id===t.id&&tx.station_name===p.station_name&&tx.tag).map(tx=>`<span style="font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 6px;color:var(--txt2)">${tx.tag}</span>`).join(' ');
-        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
-          <span style="font-size:15px;flex-shrink:0">${ps.i}</span>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px">${p.station_name} ${tags}</div>
-            <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden"><div style="width:${pc}%;height:100%;background:${ps.c};border-radius:3px"></div></div>
+    </div>
+  );
+}
+
+// ── Landing ──
+function Landing({setScreen,adminPin,operatorPin}){
+  const[showAdminLogin,setShowAdminLogin]=useState(false);
+  const[showOpLogin,setShowOpLogin]=useState(false);
+  return(
+    <div style={{background:"radial-gradient(ellipse at 60% 20%,#1a0a2e 0%,#0a0a0f 60%)",minHeight:"100vh",display:"flex",flexDirection:"column",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",inset:0,pointerEvents:"none"}}>
+        {[...Array(40)].map((_,i)=>(
+          <div key={i} style={{position:"absolute",width:i%5===0?2:1,height:i%5===0?2:1,background:"white",borderRadius:"50%",opacity:Math.random()*0.6+0.2,left:`${(i*37+13)%100}%`,top:`${(i*53+7)%100}%`}}/>
+        ))}
+      </div>
+      <div style={{position:"absolute",bottom:16,right:16,display:"flex",gap:8,zIndex:10}}>
+        <button onClick={()=>setShowAdminLogin(true)} style={{background:"#111118",border:"1px solid #1e293b",borderRadius:8,color:"#334155",cursor:"pointer",fontFamily:"monospace",fontSize:10,padding:"5px 10px",opacity:.5}}>⬡</button>
+        <button onClick={()=>setShowOpLogin(true)} style={{background:"#111118",border:"1px solid #1e293b",borderRadius:8,color:"#334155",cursor:"pointer",fontFamily:"monospace",fontSize:10,padding:"5px 10px",opacity:.5}}>⚙</button>
+        <button onClick={()=>setScreen("display")} style={{background:"#111118",border:"1px solid #1e293b",borderRadius:8,color:"#334155",cursor:"pointer",fontFamily:"monospace",fontSize:10,padding:"5px 10px",opacity:.5}}>📺</button>
+      </div>
+      <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2.5rem",padding:"2rem"}}>
+        <div style={{textAlign:"center"}}>
+          <div style={{fontSize:56,marginBottom:16}}>🪐</div>
+          <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",lineHeight:1}}>
+            <span style={{fontSize:90,fontWeight:900,color:"#ffffff",letterSpacing:-3}}>X</span>
+            <span style={{fontSize:42,fontWeight:500,color:"#a78bfa",letterSpacing:1}}>plore</span>
           </div>
-          <span style="font-size:13px;font-weight:700;color:${ps.c};flex-shrink:0">${fmt(p.amount)}</span>
-        </div>`;
-      }).join('')||`<div style="font-size:13px;color:var(--txt2);padding:8px 0">No investments yet</div>`;
-      return `<div class="team-port-card">
-        <div class="team-port-header">
-          <div class="team-port-name">${t.name}${t.insured?' 🛡️':''}</div>
-          <div class="team-port-stats">
-            <div class="team-port-stat" style="margin-right:12px"><div class="team-port-stat-l">Cash</div><div class="team-port-stat-v" style="color:#4D9FFF">${fmt(t.bal)}</div></div>
-            <div class="team-port-stat" style="margin-right:12px"><div class="team-port-stat-l">Invested</div><div class="team-port-stat-v" style="color:#9B6DFF">${fmt(tot)}</div></div>
-            <div class="team-port-stat"><div class="team-port-stat-l">Net Worth</div><div class="team-port-stat-v" style="color:#00C97F">${fmt(n)}</div></div>
+          <p style={{color:"#475569",fontSize:12,margin:"10px 0 0",letterSpacing:3}}>ECONOMY SIMULATION PLATFORM</p>
+        </div>
+        <div style={{background:"linear-gradient(135deg,#0d1f0d,#0a180a)",border:"1px solid #166534",borderRadius:20,padding:"2.5rem 3rem",width:360,textAlign:"center",boxShadow:"0 0 40px #22c55e18"}}>
+          <div style={{fontSize:36,marginBottom:10}}>🚀</div>
+          <h2 style={{color:"#86efac",margin:"0 0 6px",letterSpacing:2,fontSize:18}}>TEAM DASHBOARD</h2>
+          <p style={{color:"#475569",fontSize:12,margin:"0 0 1.5rem"}}>Select your team to view your status</p>
+          <Btn onClick={()=>setScreen("team")} color="#14532d" border="#22c55e" textColor="#86efac" style={{width:"100%",padding:"12px",fontSize:15,letterSpacing:1}}>ENTER TEAM DASHBOARD</Btn>
+        </div>
+        <p style={{color:"#1e293b",fontSize:11}}>v1.0 · Planet X Economy Simulation</p>
+      </div>
+      {showAdminLogin&&(
+        <div style={{position:"fixed",inset:0,background:"#00000088",display:"flex",alignItems:"flex-end",justifyContent:"flex-end",padding:24,zIndex:50}}>
+          <div style={{background:"#111118",border:"1px solid #1e293b",borderRadius:14,padding:"1.5rem",width:260,boxShadow:"0 20px 60px #000"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+              <span style={{color:"#a78bfa",fontSize:13,fontWeight:700}}>⬡ Super Admin</span>
+              <button onClick={()=>setShowAdminLogin(false)} style={{background:"none",border:"none",color:"#475569",cursor:"pointer",fontSize:16}}>✕</button>
+            </div>
+            <MiniPin correctPin={adminPin} onSuccess={()=>{setShowAdminLogin(false);setScreen("admin");}} onClose={()=>setShowAdminLogin(false)}/>
           </div>
         </div>
-        ${portRows}
-      </div>`;
-    }).join('');
-    c.innerHTML=`<div>${teamCards||'<div class="sec"><div class="empty">No teams yet</div></div>'}</div>`;
-  }
-}
-window.recInv=async sid=>{
-  const st=DB.stations.find(s=>s.id===sid);
-  const tid=document.getElementById('invT').value;
-  const t=DB.teams.find(x=>x.id===tid);
-  const amt=parseInt(document.getElementById('invA').value)||0;
-  const subEl=document.getElementById('invSub');
-  const subSel=subEl?subEl.value:'';
-  const customTag=document.getElementById('invTag').value.trim();
-  const tag=customTag||(subSel&&subSel!=='__custom__'?subSel:'');
-  const e=document.getElementById('invE');
-  if (amt<=0){e.textContent='Please enter a valid amount';return;}
-  if (amt>t.bal){e.textContent=`${t.name} only has ${fmt(t.bal)} available`;return;}
-  await sb.from('teams').update({bal:t.bal-amt,...(st.name==='Insurance'?{insured:true}:{})}).eq('id',tid);
-  const existing=DB.portfolio.find(p=>p.team_id===tid&&p.station_name===st.name);
-  if (existing) await sb.from('portfolio').update({amount:existing.amount+amt}).eq('id',existing.id);
-  else await sb.from('portfolio').insert({id:'p'+uid(),team_id:tid,station_name:st.name,amount:amt,round:DB.game.cur_round});
-  await sb.from('transactions').insert({id:uid(),team_id:tid,station_name:st.name,type:'invest',amount:-amt,tag,round:DB.game.cur_round,ts:Date.now()});
-  document.getElementById('invA').value=''; e.textContent='';
-  await loadAll(); renderSt();
-  toast(`✅ ${t.name} invested ${fmt(amt)} in ${st.name}${tag?' · '+tag:''}`);
-};
-
-// ══════════════════════════════════════════
-// TEAM SCREEN — Home + Stocks tabs, no rank, no scenario details
-// ══════════════════════════════════════════
-function renderTm() {
-  const t=DB.teams.find(x=>x.id===user.tid); if(!t) return;
-  document.getElementById('tmBadge').textContent=t.name;
-  document.getElementById('tmRnd').textContent=DB.game.status==='active'?`Round ${DB.game.cur_round}/${DB.game.total_rounds}`:'';
-  document.getElementById('teamContent').innerHTML=`
-    <div class="nav-tabs">
-      <button class="ntab tm-tab on" data-tab="home" onclick="setTmTab('home')">🏠 Home</button>
-      <button class="ntab tm-tab" data-tab="stocks" onclick="setTmTab('stocks')">📈 Stocks</button>
+      )}
+      {showOpLogin&&(
+        <div style={{position:"fixed",inset:0,background:"#00000088",display:"flex",alignItems:"flex-end",justifyContent:"flex-end",padding:24,zIndex:50}}>
+          <div style={{background:"#111118",border:"1px solid #1e293b",borderRadius:14,padding:"1.5rem",width:260,boxShadow:"0 20px 60px #000"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+              <span style={{color:"#a78bfa",fontSize:13,fontWeight:700}}>⚙ Operator</span>
+              <button onClick={()=>setShowOpLogin(false)} style={{background:"none",border:"none",color:"#475569",cursor:"pointer",fontSize:16}}>✕</button>
+            </div>
+            <MiniPin correctPin={operatorPin} onSuccess={()=>{setShowOpLogin(false);setScreen("operator");}} onClose={()=>setShowOpLogin(false)}/>
+          </div>
+        </div>
+      )}
     </div>
-    <div id="tmTabContent"></div>`;
-  tmTab='home'; renderTmTab();
+  );
 }
-function renderTmInner() {
-  const t=DB.teams.find(x=>x.id===user.tid); if(!t) return;
-  document.getElementById('tmBadge').textContent=t.name;
-  document.getElementById('tmRnd').textContent=DB.game.status==='active'?`Round ${DB.game.cur_round}/${DB.game.total_rounds}`:'';
-  renderTmTab();
+function MiniPin({correctPin,onSuccess,onClose}){
+  const[val,setVal]=useState("");const[err,setErr]=useState("");
+  const attempt=()=>{if(val===correctPin)onSuccess();else{setErr("Incorrect PIN");setVal("");}};
+  return(
+    <>
+      <input type="password" value={val} onChange={e=>setVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&attempt()} placeholder="PIN" style={{padding:"8px 10px",background:"#0f172a",border:"1px solid #1e293b",borderRadius:8,color:"#e2e8f0",fontFamily:"monospace",fontSize:13,outline:"none",width:"100%",textAlign:"center",letterSpacing:6,marginBottom:8}}/>
+      {err&&<p style={{color:"#ef4444",fontSize:11,margin:"0 0 8px"}}>{err}</p>}
+      <Btn onClick={attempt} style={{width:"100%"}}>Enter</Btn>
+    </>
+  );
 }
-window.setTmTab=tab=>{
-  tmTab=tab;
-  document.querySelectorAll('.tm-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
-  renderTmTab();
-};
-function renderTmTab() {
-  const c=document.getElementById('tmTabContent'); if(!c) return;
-  const t=DB.teams.find(x=>x.id===user.tid); if(!t) return;
-  if (tmTab==='home') {
-    const port=DB.portfolio.filter(p=>p.team_id===t.id);
-    const tot=port.reduce((s,p)=>s+p.amount,0);
-    const n=teamNetWorth(t),d=n-DB.game.start_bal;
-    const pct=n>0?Math.round(tot/n*100):0;
-    const portItems=port.map(p=>{
-      const s=SC[p.station_name]||{i:'💰',c:'#888'};
-      const pc=tot>0?Math.round(p.amount/tot*100):0;
-      const tags=DB.transactions.filter(tx=>tx.team_id===t.id&&tx.station_name===p.station_name&&tx.tag).map(tx=>`<span style="font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 7px;color:var(--txt2)">${tx.tag}</span>`).join(' ');
-      return `<div class="pb" style="margin-bottom:16px"><div class="pb-top"><span class="pb-nm">${s.i} ${p.station_name} ${tags}</span><span class="pb-vl">${fmt(p.amount)} · ${pc}%</span></div>
-        <div class="pb-track"><div class="pb-fill" style="width:${pc}%;background:${s.c}"></div></div></div>`;
-    }).join('')||'<div class="empty">No investments yet — visit the stations!</div>';
-    const myTxs=DB.transactions.filter(tx=>tx.team_id===t.id).slice(0,10);
-    const txH=myTxs.map(tx=>{
-      const s=SC[tx.station_name]||{i:'💰',bg:'rgba(255,255,255,.08)'};
-      const lbl=tx.type==='invest'?'Invested':tx.type==='return'?'Return':tx.type==='adjust'?'Adjustment':'Event';
-      const tag=tx.tag?`<span style="font-size:11px;background:var(--bg4);border-radius:5px;padding:2px 7px;margin-left:6px;color:var(--txt2)">${tx.tag}</span>`:'';
-      return `<div class="tx-row"><div class="tx-ic" style="background:${s.bg}">${s.i}</div>
-        <div class="tx-in"><div class="tx-nm">${lbl}: ${tx.station_name}${tag}</div><div class="tx-ti">Round ${tx.round} · ${new Date(tx.ts).toLocaleTimeString()}</div></div>
-        <div class="tx-am ${tx.amount<0?'neg':'pos'}">${tx.amount<0?'':'+'}${fmt(Math.abs(tx.amount))}</div></div>`;
-    }).join('')||'<div class="empty">No transactions yet</div>';
-    c.innerHTML=`
-      <div class="g4">
-      <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(77,168,255,.14),transparent)"><div class="stat-ico">💵</div><div class="stat-l">Cash Left</div><div class="stat-v" style="font-size:17px">${fmt(t.bal)}</div></div>
-        <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(163,116,255,.14),transparent)"><div class="stat-ico">📊</div><div class="stat-l">Invested</div><div class="stat-v" style="font-size:17px">${fmt(tot)}</div></div>
-        <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(0,214,138,.14),transparent)"><div class="stat-ico">💎</div><div class="stat-l">Net Worth</div><div class="stat-v" style="font-size:17px;color:#00D68A">${fmt(n)}</div>
-          <div class="stat-s" style="color:${d>=0?'#00D68A':'#FF5252'}">${d>=0?'▲':'▼'} ${fmt(Math.abs(d))}</div></div>
-        <div class="stat-tile" style="--tile-grad:linear-gradient(135deg,rgba(255,184,48,.14),transparent)"><div class="stat-ico">🎯</div><div class="stat-l">Round</div><div class="stat-v">${DB.game.cur_round||'—'}<span style="font-size:14px;color:var(--txt2)"> / ${DB.game.total_rounds}</span></div>
-          <div class="stat-s">${t.insured?'🛡️ Protected':''}</div></div>
+
+// ── Display Screen ──
+function DisplayScreen({commodities,sorted,round,activeScenario,tradingOpen,onBack,priceHistory}){
+  return(
+    <div style={{background:"#050508",minHeight:"100vh",fontFamily:"monospace",color:"#e2e8f0",display:"flex",flexDirection:"column",padding:"2rem",gap:"2rem"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{display:"flex",alignItems:"baseline",gap:4}}>
+          <span style={{fontSize:28,fontWeight:900,color:"#fff"}}>Xpl</span><span style={{fontSize:18,color:"#a78bfa"}}>ore</span><span style={{fontSize:28,fontWeight:900,color:"#fff"}}> X</span>
+          <span style={{color:"#475569",fontSize:13,marginLeft:16}}>Round {round} · {activeScenario.name}</span>
+        </div>
+        <div style={{display:"flex",gap:12,alignItems:"center"}}>
+          <span style={{fontSize:13,color:tradingOpen?"#22c55e":"#ef4444",background:tradingOpen?"#052e16":"#450a0a",padding:"5px 14px",borderRadius:20,border:`1px solid ${tradingOpen?"#166534":"#991b1b"}`}}>● {tradingOpen?"TRADING OPEN":"TRADING CLOSED"}</span>
+          <button onClick={onBack} style={{background:"none",border:"1px solid #1e293b",borderRadius:8,color:"#475569",cursor:"pointer",fontFamily:"monospace",fontSize:11,padding:"5px 10px"}}>← Back</button>
+        </div>
       </div>
-      <div class="g2">
-        <div class="sec"><div class="sec-h"><span class="sec-t">📊 My Portfolio</span><span class="badge badge-p">${pct}% invested</span></div>${portItems}</div>
-        <div class="sec"><div class="sec-h"><span class="sec-t">⚡ My Transactions</span></div>${txH}</div>
-      </div>`;
-  } else {
-    c.innerHTML=`<div class="sec"><div class="sec-h"><span class="sec-t">📈 Stock Market</span></div>${stockChartUI(false)}</div>`;
-  }
+      <div>
+        <p style={{color:"#475569",fontSize:11,letterSpacing:2,margin:"0 0 12px"}}>LIVE MARKET PRICES</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:14}}>
+          {commodities.map(c=>{
+            const hist=priceHistory[c.id]||[];
+            const prev=hist.length>=2?hist[hist.length-2]:null;
+            const change=prev?((c.price-prev)/prev*100).toFixed(1):null;
+            return(
+              <div key={c.id} style={{background:"#0f172a",borderRadius:14,padding:"1.5rem",textAlign:"center",border:`1px solid ${c.color}44`,boxShadow:`0 0 20px ${c.color}11`}}>
+                <div style={{fontSize:36,marginBottom:6}}>{c.icon}</div>
+                <div style={{fontSize:15,color:"#94a3b8",marginBottom:6}}>{c.name}</div>
+                <div style={{fontSize:30,fontWeight:900,color:c.color}}>🪙 {c.price.toLocaleString()}</div>
+                {change!==null&&<div style={{fontSize:13,marginTop:6,color:parseFloat(change)>0?"#22c55e":parseFloat(change)<0?"#ef4444":"#64748b"}}>{parseFloat(change)>0?"▲":"▼"} {Math.abs(change)}%</div>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <p style={{color:"#475569",fontSize:11,letterSpacing:2,margin:"0 0 12px"}}>LEADERBOARD</p>
+        <div style={{display:"grid",gap:10}}>
+          {sorted.map((t,i)=>{
+            const nw=netWorth(t,commodities);
+            const pct=sorted[0]?(nw/netWorth(sorted[0],commodities))*100:100;
+            return(
+              <div key={t.id} style={{background:"#0f172a",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,border:i<3?`1px solid ${t.color}44`:"1px solid #1e293b"}}>
+                <span style={{fontSize:i<3?26:14,width:34,textAlign:"center",color:i<3?"inherit":"#475569",flexShrink:0}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`}</span>
+                <Avatar name={t.name} color={t.color} size={40}/>
+                <div style={{flex:1}}>
+                  <p style={{margin:"0 0 4px",fontSize:14,color:"#e2e8f0",fontWeight:700}}>{t.name}</p>
+                  <div style={{height:4,background:"#1e293b",borderRadius:2}}><div style={{height:"100%",width:`${pct}%`,background:t.color,borderRadius:2}}/></div>
+                </div>
+                <p style={{margin:0,fontSize:16,color:"#a78bfa",fontWeight:900,flexShrink:0}}>🪙 {nw.toLocaleString()}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// ── MODAL & TOAST ──
-window.modal=html=>document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`;
-window.closeModal=()=>document.getElementById('modalRoot').innerHTML='';
-window.toast=(msg,type='g')=>{
-  const t=document.createElement('div');
-  const col={g:'linear-gradient(135deg,#00D68A,#00AA6E)',r:'linear-gradient(135deg,#FF5252,#CC2222)',a:'linear-gradient(135deg,#FFB830,#CC8800)'};
-  t.style.cssText=`position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${col[type]||col.g};color:#fff;padding:12px 22px;border-radius:16px;font-size:14px;font-weight:700;z-index:999;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.5);letter-spacing:.02em`;
-  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2800);
-};
+// ── Admin Portal ──
+function AdminPortal(props){
+  const[authed,setAuthed]=useState(false);
+  const[sideOpen,setSideOpen]=useState(true);
+  const[activePage,setActivePage]=useState("mission");
+  if(!authed)return <PinLogin title="SUPER ADMIN" sub="MISSION CONTROL ACCESS" icon="⬡" correctPin={props.adminPin} onSuccess={()=>setAuthed(true)} onBack={props.onLogout}/>;
+  const pages=[
+    {id:"mission",icon:"🛸",label:"Mission Control"},
+    {id:"scenarios",icon:"🌌",label:"Scenarios"},
+    {id:"commodities",icon:"📦",label:"Commodities"},
+    {id:"salaries",icon:"🪙",label:"Salaries"},
+    {id:"teams",icon:"👥",label:"Teams"},
+    {id:"leaderboard",icon:"🏆",label:"Leaderboard"},
+    {id:"operators",icon:"🔐",label:"Operators"},
+    {id:"audit",icon:"📋",label:"Audit Log"},
+    {id:"danger",icon:"⚠️",label:"Danger Zone"},
+  ];
+  return(
+    <div style={{display:"flex",minHeight:"100vh",background:"#0a0a0f"}}>
+      <div style={{width:sideOpen?220:56,flexShrink:0,background:"#0d0d14",borderRight:"1px solid #1e293b",display:"flex",flexDirection:"column",transition:"width .2s",overflow:"hidden"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:sideOpen?"space-between":"center",padding:"14px 12px",borderBottom:"1px solid #1e293b"}}>
+          {sideOpen&&<span style={{color:"#a78bfa",fontWeight:700,fontSize:13,letterSpacing:1,whiteSpace:"nowrap"}}>⬡ PLANET X</span>}
+          <button onClick={()=>setSideOpen(o=>!o)} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:18,lineHeight:1,padding:2}}>{sideOpen?"‹":"›"}</button>
+        </div>
+        <div style={{flex:1,padding:"8px 6px",overflowY:"auto"}}>
+          {pages.map(p=>(
+            <button key={p.id} onClick={()=>setActivePage(p.id)} title={p.label} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 8px",borderRadius:8,background:activePage===p.id?"#1e1b4b":"transparent",border:activePage===p.id?"1px solid #3730a3":"1px solid transparent",color:activePage===p.id?"#c4b5fd":"#64748b",cursor:"pointer",fontFamily:"monospace",fontSize:13,marginBottom:2,textAlign:"left",whiteSpace:"nowrap",overflow:"hidden"}}>
+              <span style={{flexShrink:0,fontSize:16}}>{p.icon}</span>
+              {sideOpen&&<span>{p.label}</span>}
+            </button>
+          ))}
+        </div>
+        <div style={{padding:"10px 6px",borderTop:"1px solid #1e293b"}}>
+          <button onClick={props.onLogout} style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 8px",borderRadius:8,background:"transparent",border:"none",color:"#475569",cursor:"pointer",fontFamily:"monospace",fontSize:13,textAlign:"left",whiteSpace:"nowrap"}}>
+            <span style={{flexShrink:0}}>🚪</span>{sideOpen&&<span>Logout</span>}
+          </button>
+        </div>
+      </div>
+      <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+        <div style={{background:"#111118",borderBottom:"1px solid #1e293b",padding:"12px 1.5rem",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div>
+            <span style={{color:"#e2e8f0",fontSize:15,fontWeight:700}}>{pages.find(p=>p.id===activePage)?.label}</span>
+            <span style={{color:"#475569",fontSize:12,marginLeft:16}}>Round {props.round} · {props.activeScenario.name}</span>
+          </div>
+          <div style={{display:"flex",gap:10,alignItems:"center"}}>
+            <span style={{fontSize:12,color:props.tradingOpen?"#22c55e":"#ef4444",background:props.tradingOpen?"#052e16":"#450a0a",padding:"4px 10px",borderRadius:20,border:`1px solid ${props.tradingOpen?"#166534":"#991b1b"}`}}>● {props.tradingOpen?"TRADING OPEN":"TRADING CLOSED"}</span>
+            {props.pendingSalaries.length>0&&<span style={{fontSize:12,color:"#fbbf24",background:"#1c1917",padding:"4px 10px",borderRadius:20,border:"1px solid #854d0e"}}>⏳ {props.pendingSalaries.length} salary pending</span>}
+          </div>
+        </div>
+        <div style={{flex:1,padding:"1.5rem",overflowY:"auto"}}>
+          {activePage==="mission"&&<PageMission {...props}/>}
+          {activePage==="scenarios"&&<PageScenarios {...props}/>}
+          {activePage==="commodities"&&<PageCommodities {...props}/>}
+          {activePage==="salaries"&&<PageSalaries {...props}/>}
+          {activePage==="teams"&&<PageTeams {...props}/>}
+          {activePage==="leaderboard"&&<PageLeaderboard {...props}/>}
+          {activePage==="operators"&&<PageOperators {...props}/>}
+          {activePage==="audit"&&<PageAudit {...props}/>}
+          {activePage==="danger"&&<PageDanger {...props}/>}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-boot();
+function PageMission({round,activeScenario,tradingOpen,setTradingOpen,scenarios,startRound,addAudit,commodities,sorted}){
+  const[nextScenarioId,setNextScenarioId]=useState(scenarios[0]?.id);
+  const[nextRound,setNextRound]=useState(round+1);
+  useEffect(()=>setNextRound(round+1),[round]);
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
+      <div>
+        <Card style={{marginBottom:"1rem"}}>
+          <SectionLabel>Current Status</SectionLabel>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}}>
+            <div style={{background:"#0f172a",borderRadius:8,padding:"12px"}}><p style={{margin:0,fontSize:10,color:"#475569"}}>ROUND</p><p style={{margin:0,fontSize:24,color:"#a78bfa",fontWeight:700}}>{round}</p></div>
+            <div style={{background:"#0f172a",borderRadius:8,padding:"12px"}}><p style={{margin:0,fontSize:10,color:"#475569"}}>SCENARIO</p><p style={{margin:0,fontSize:13,color:"#e2e8f0"}}>{activeScenario.name}</p></div>
+          </div>
+          <div style={{background:"#0f172a",borderRadius:8,padding:"10px 12px",marginBottom:12}}>
+            <p style={{margin:0,fontSize:11,color:"#64748b"}}>{activeScenario.desc}</p>
+          </div>
+          <Btn onClick={()=>{setTradingOpen(o=>!o);addAudit(`Trading ${tradingOpen?"CLOSED":"OPENED"}`);}} color={tradingOpen?"#450a0a":"#052e16"} border={tradingOpen?"#991b1b":"#166534"} textColor={tradingOpen?"#fca5a5":"#86efac"} style={{width:"100%"}}>{tradingOpen?"⛔ Close Trading":"✅ Open Trading"}</Btn>
+        </Card>
+        <Card>
+          <SectionLabel>Start Next Round</SectionLabel>
+          <p style={{color:"#64748b",fontSize:12,margin:"0 0 10px"}}>Select scenario for round {nextRound}:</p>
+          {scenarios.map(sc=>(
+            <div key={sc.id} onClick={()=>setNextScenarioId(sc.id)} style={{padding:"10px 12px",borderRadius:8,cursor:"pointer",background:nextScenarioId===sc.id?"#1e1b4b":"#0f172a",border:nextScenarioId===sc.id?"1px solid #7c3aed":"1px solid #1e293b",marginBottom:6}}>
+              <p style={{margin:"0 0 2px",fontSize:13,color:"#e2e8f0"}}>{sc.name}</p>
+              <p style={{margin:0,fontSize:11,color:"#64748b"}}>{sc.desc}</p>
+            </div>
+          ))}
+          <Btn onClick={()=>startRound(nextRound,nextScenarioId)} color="#14532d" border="#22c55e" textColor="#86efac" style={{width:"100%",marginTop:12,padding:"10px"}}>▶ START ROUND {nextRound}</Btn>
+        </Card>
+      </div>
+      <div>
+        <Card style={{marginBottom:"1rem"}}>
+          <SectionLabel>Market Prices</SectionLabel>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:6}}>
+            {commodities.map(c=><PriceBadge key={c.id} c={c}/>)}
+          </div>
+        </Card>
+        <Card>
+          <SectionLabel>Live Standings</SectionLabel>
+          {sorted.slice(0,5).map((t,i)=>(
+            <div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:"1px solid #0f172a"}}>
+              <span style={{color:"#475569",fontSize:12,width:20}}>{i+1}.</span>
+              <Avatar name={t.name} color={t.color} size={28}/>
+              <span style={{flex:1,fontSize:13,color:"#e2e8f0"}}>{t.name}</span>
+              <span style={{fontSize:13,color:"#a78bfa"}}>🪙 {netWorth(t,commodities).toLocaleString()}</span>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function PageScenarios({scenarios,setScenarios,commodities,addAudit}){
+  const[editing,setEditing]=useState(null);
+  const[form,setForm]=useState(null);
+  const[newName,setNewName]=useState("");const[newDesc,setNewDesc]=useState("");
+  function openEdit(sc){setEditing(sc.id);setForm({name:sc.name,desc:sc.desc,effects:{...sc.effects}});}
+  function saveEdit(){setScenarios(s=>s.map(x=>x.id===editing?{...x,...form}:x));addAudit(`Scenario updated: ${form.name}`);setEditing(null);setForm(null);}
+  function deleteScenario(id){setScenarios(s=>s.filter(x=>x.id!==id));addAudit(`Scenario deleted`);}
+  function addScenario(){
+    if(!newName.trim())return;
+    const effects=Object.fromEntries(commodities.map(c=>[c.id,1]));
+    setScenarios(s=>[...s,{id:`sc${Date.now()}`,name:newName,desc:newDesc,effects}]);
+    addAudit(`Scenario added: ${newName}`);setNewName("");setNewDesc("");
+  }
+  return(
+    <div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:"1.5rem"}}>
+        {scenarios.map(sc=>(
+          <Card key={sc.id}>
+            {editing===sc.id&&form?(
+              <div>
+                <Input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={{width:"100%",marginBottom:8,boxSizing:"border-box"}}/>
+                <Input value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))} style={{width:"100%",marginBottom:12,boxSizing:"border-box"}}/>
+                <SectionLabel>Price Multipliers</SectionLabel>
+                {commodities.map(c=>(
+                  <div key={c.id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                    <span style={{fontSize:16}}>{c.icon}</span>
+                    <span style={{flex:1,fontSize:13,color:"#e2e8f0"}}>{c.name}</span>
+                    <Input type="number" value={form.effects[c.id]||1} onChange={e=>setForm(f=>({...f,effects:{...f.effects,[c.id]:parseFloat(e.target.value)||1}}))} style={{width:70,textAlign:"center"}}/>
+                    <span style={{fontSize:11,color:(form.effects[c.id]||1)>1?"#22c55e":(form.effects[c.id]||1)<1?"#ef4444":"#64748b"}}>{(((form.effects[c.id]||1)-1)*100).toFixed(0)}%</span>
+                  </div>
+                ))}
+                <div style={{display:"flex",gap:6,marginTop:10}}>
+                  <Btn onClick={saveEdit} color="#14532d" border="#22c55e" textColor="#86efac" style={{flex:1}}>Save</Btn>
+                  <Btn onClick={()=>setEditing(null)} color="#1e293b" border="#334155" style={{flex:1}}>Cancel</Btn>
+                </div>
+              </div>
+            ):(
+              <div>
+                <p style={{margin:"0 0 2px",fontSize:14,color:"#e2e8f0",fontWeight:700}}>{sc.name}</p>
+                <p style={{margin:"0 0 10px",fontSize:11,color:"#64748b"}}>{sc.desc}</p>
+                <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:12}}>
+                  {commodities.map(c=>{const eff=sc.effects[c.id]||1;const col=eff>1?"#22c55e":eff<1?"#ef4444":"#64748b";return <span key={c.id} style={{fontSize:11,padding:"2px 6px",borderRadius:4,background:"#0f172a",color:col}}>{c.icon} {eff>1?"+":""}{((eff-1)*100).toFixed(0)}%</span>;})}
+                </div>
+                <div style={{display:"flex",gap:6}}>
+                  <Btn onClick={()=>openEdit(sc)} style={{flex:1,padding:"6px"}}>✏ Edit</Btn>
+                  <Btn onClick={()=>deleteScenario(sc.id)} color="#450a0a" border="#991b1b" textColor="#fca5a5" style={{flex:1,padding:"6px"}}>✕ Delete</Btn>
+                </div>
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <SectionLabel>Add New Scenario</SectionLabel>
+        <div style={{display:"flex",gap:8,marginBottom:8}}>
+          <Input value={newName} onChange={e=>setNewName(e.target.value)} placeholder="Scenario name" style={{flex:1}}/>
+          <Input value={newDesc} onChange={e=>setNewDesc(e.target.value)} placeholder="Short description" style={{flex:2}}/>
+        </div>
+        <Btn onClick={addScenario} color="#14532d" border="#22c55e" textColor="#86efac">+ Add Scenario</Btn>
+      </Card>
+    </div>
+  );
+}
+
+function PageCommodities({commodities,setCommodities,addAudit}){
+  const[form,setForm]=useState(commodities.map(c=>({...c})));
+  useEffect(()=>setForm(commodities.map(c=>({...c}))),[commodities]);
+  function save(){setCommodities(form.map(c=>({...c})));addAudit("Commodities updated");}
+  function addComm(){setForm(f=>[...f,{id:`cm${Date.now()}`,name:"New Commodity",icon:"🔮",color:"#a78bfa",price:500}]);}
+  function del(idx){setForm(f=>f.filter((_,i)=>i!==idx));}
+  return(
+    <Card>
+      <SectionLabel>Commodities — Edit Names, Icons, Colors & Prices</SectionLabel>
+      <div style={{display:"grid",gap:10,marginBottom:12}}>
+        <div style={{display:"grid",gridTemplateColumns:"44px 1fr 130px 110px 40px 36px",gap:8,padding:"0 4px"}}>
+          {["Icon","Name","Color (hex)","New Price","",""].map((h,i)=><span key={i} style={{fontSize:10,color:"#475569",letterSpacing:1}}>{h}</span>)}
+        </div>
+        {form.map((c,i)=>(
+          <div key={c.id} style={{display:"grid",gridTemplateColumns:"44px 1fr 130px 110px 40px 36px",gap:8,alignItems:"center",background:"#0f172a",padding:"10px 12px",borderRadius:8}}>
+            <Input value={c.icon} onChange={e=>setForm(f=>f.map((x,j)=>j===i?{...x,icon:e.target.value}:x))} style={{width:36,textAlign:"center",padding:"6px 4px",fontSize:18}}/>
+            <Input value={c.name} onChange={e=>setForm(f=>f.map((x,j)=>j===i?{...x,name:e.target.value}:x))} style={{width:"100%",boxSizing:"border-box"}}/>
+            <Input value={c.color} onChange={e=>setForm(f=>f.map((x,j)=>j===i?{...x,color:e.target.value}:x))} style={{width:"100%",boxSizing:"border-box"}}/>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <span style={{color:"#64748b",fontSize:13,flexShrink:0}}>🪙</span>
+              <Input type="number" value={c.price} onChange={e=>setForm(f=>f.map((x,j)=>j===i?{...x,price:parseInt(e.target.value)||0}:x))} style={{width:"100%",boxSizing:"border-box",textAlign:"center"}}/>
+            </div>
+            <div style={{width:28,height:28,borderRadius:"50%",background:c.color,border:"2px solid #1e293b",flexShrink:0}}/>
+            <button onClick={()=>del(i)} style={{background:"#450a0a",border:"none",borderRadius:6,color:"#fca5a5",cursor:"pointer",fontSize:14,width:32,height:32}}>✕</button>
+          </div>
+        ))}
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        <Btn onClick={addComm} color="#0c1a2e" border="#1d4ed8" textColor="#93c5fd">+ Add</Btn>
+        <Btn onClick={save} color="#14532d" border="#22c55e" textColor="#86efac">✓ Save Changes</Btn>
+      </div>
+    </Card>
+  );
+}
+
+function PageSalaries({salaries,setSalaries,addAudit,pendingSalaries,approveSalary,approveAllSalaries,teams}){
+  const[form,setForm]=useState([...salaries]);
+  useEffect(()=>setForm([...salaries]),[salaries]);
+  function save(){setSalaries([...form]);addAudit("Salary schedule updated");}
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
+      <Card>
+        <SectionLabel>Salary Schedule (per round)</SectionLabel>
+        {form.map((s,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,marginBottom:10,background:"#0f172a",padding:"10px 12px",borderRadius:8}}>
+            <span style={{color:"#64748b",fontSize:13,width:64,flexShrink:0}}>Round {i+1}</span>
+            <Input type="number" value={s} onChange={e=>setForm(f=>f.map((x,j)=>j===i?parseInt(e.target.value)||0:x))} style={{width:100,textAlign:"center"}}/>
+            <span style={{fontSize:13,color:s>0?"#22c55e":"#ef4444"}}>🪙 {s.toLocaleString()}</span>
+          </div>
+        ))}
+        <div style={{display:"flex",gap:8,marginTop:4}}>
+          <Btn onClick={()=>setForm(f=>[...f,1000])} color="#0c1a2e" border="#1d4ed8" textColor="#93c5fd">+ Add Round</Btn>
+          <Btn onClick={save} color="#14532d" border="#22c55e" textColor="#86efac">✓ Save</Btn>
+        </div>
+      </Card>
+      <Card>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <SectionLabel>Pending Approvals ({pendingSalaries.length})</SectionLabel>
+          {pendingSalaries.length>0&&<Btn onClick={approveAllSalaries} color="#14532d" border="#22c55e" textColor="#86efac" style={{padding:"5px 12px",fontSize:12}}>Approve All</Btn>}
+        </div>
+        {pendingSalaries.length===0?<p style={{color:"#334155",fontSize:13}}>No pending salaries.</p>:
+          pendingSalaries.map(p=>{const t=teams.find(x=>x.id===p.teamId);return(
+            <div key={p.teamId} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:"1px solid #0f172a"}}>
+              {t&&<Avatar name={t.name} color={t.color} size={28}/>}
+              <span style={{flex:1,fontSize:13,color:"#e2e8f0"}}>{t?.name}</span>
+              <span style={{fontSize:13,color:"#fbbf24"}}>🪙 {p.amount.toLocaleString()}</span>
+              <Btn onClick={()=>approveSalary(p.teamId)} color="#14532d" border="#22c55e" textColor="#86efac" style={{padding:"4px 10px",fontSize:11}}>✓</Btn>
+            </div>
+          );})}
+      </Card>
+    </div>
+  );
+}
+
+function PageTeams({teams,setTeams,commodities,addAudit,sorted}){
+  const[selId,setSelId]=useState(null);
+  const[newName,setNewName]=useState("");
+  const[adjAmt,setAdjAmt]=useState(500);
+  const[adjReason,setAdjReason]=useState("");
+  const[adjType,setAdjType]=useState("add");
+  const team=teams.find(t=>t.id===selId);
+  function addTeam(){if(!newName.trim())return;const nc={id:`t${Date.now()}`,name:newName,color:COLORS[teams.length%COLORS.length],cash:6000,holdings:Object.fromEntries(commodities.map(c=>[c.id,0])),transactions:[]};setTeams(t=>[...t,nc]);addAudit(`Team added: ${newName}`);setNewName("");}
+  function delTeam(id){setTeams(t=>t.filter(x=>x.id!==id));if(selId===id)setSelId(null);addAudit(`Team removed`);}
+  function applyAdj(){
+    if(!adjReason||!team)return;
+    const delta=adjType==="add"?adjAmt:-adjAmt;
+    setTeams(prev=>prev.map(t=>{if(t.id!==selId)return t;const tx={type:"adjustment",commodityId:null,qty:1,amount:Math.abs(delta),reason:adjReason,ts:ts()};return{...t,cash:t.cash+delta,transactions:[tx,...t.transactions]};}));
+    addAudit(`Cash ${adjType==="add"?"+":"-"}🪙${adjAmt} → ${team.name}: ${adjReason}`);setAdjReason("");
+  }
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1.4fr",gap:"1.5rem"}}>
+      <Card>
+        <SectionLabel>All Teams</SectionLabel>
+        <div style={{display:"flex",gap:6,marginBottom:12}}>
+          <Input value={newName} onChange={e=>setNewName(e.target.value)} placeholder="New team name" style={{flex:1}}/>
+          <Btn onClick={addTeam} color="#14532d" border="#22c55e" textColor="#86efac">Add</Btn>
+        </div>
+        <div style={{maxHeight:420,overflowY:"auto"}}>
+          {sorted.map((t,i)=>(
+            <div key={t.id} onClick={()=>setSelId(t.id)} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:8,cursor:"pointer",background:selId===t.id?"#1e1b4b":"transparent",border:selId===t.id?"1px solid #3730a3":"1px solid transparent",marginBottom:4}}>
+              <span style={{color:"#475569",fontSize:11,width:18}}>#{i+1}</span>
+              <Avatar name={t.name} color={t.color} size={30}/>
+              <div style={{flex:1}}><p style={{margin:0,fontSize:13,color:"#e2e8f0"}}>{t.name}</p><p style={{margin:0,fontSize:11,color:"#64748b"}}>🪙 {netWorth(t,commodities).toLocaleString()}</p></div>
+              <button onClick={e=>{e.stopPropagation();delTeam(t.id);}} style={{background:"#450a0a",border:"none",borderRadius:4,color:"#fca5a5",cursor:"pointer",fontSize:11,padding:"2px 7px"}}>✕</button>
+            </div>
+          ))}
+        </div>
+      </Card>
+      <div>
+        {!team?<Card><p style={{color:"#334155",textAlign:"center",padding:"2rem 0"}}>Select a team to view details.</p></Card>:(
+          <Card>
+            <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:"1rem"}}>
+              <Avatar name={team.name} color={team.color} size={44}/>
+              <div>
+                <p style={{margin:0,fontSize:16,color:"#e2e8f0"}}>{team.name}</p>
+                <p style={{margin:0,fontSize:12,color:"#22c55e"}}>🪙 {team.cash.toLocaleString()} cash · NW: 🪙 {netWorth(team,commodities).toLocaleString()}</p>
+              </div>
+            </div>
+            <SectionLabel>Holdings</SectionLabel>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:6,marginBottom:"1rem"}}>
+              {commodities.map(c=>(
+                <div key={c.id} style={{background:"#0f172a",borderRadius:8,padding:"8px",textAlign:"center",opacity:(team.holdings[c.id]||0)===0?.4:1}}>
+                  <div style={{fontSize:18}}>{c.icon}</div>
+                  <div style={{fontSize:13,color:c.color,fontWeight:700}}>{team.holdings[c.id]||0}</div>
+                  <div style={{fontSize:10,color:"#64748b"}}>{c.name}</div>
+                </div>
+              ))}
+            </div>
+            <SectionLabel>Cash Adjustment</SectionLabel>
+            <div style={{display:"flex",gap:6,marginBottom:8}}>
+              {["add","deduct"].map(type=>(
+                <button key={type} onClick={()=>setAdjType(type)} style={{flex:1,padding:"7px",background:adjType===type?(type==="add"?"#052e16":"#450a0a"):"#0f172a",border:`1px solid ${adjType===type?(type==="add"?"#22c55e":"#ef4444"):"#1e293b"}`,color:adjType===type?(type==="add"?"#86efac":"#fca5a5"):"#64748b",borderRadius:7,cursor:"pointer",fontSize:12,fontFamily:"monospace"}}>{type==="add"?"＋ Add Cash":"－ Deduct Cash"}</button>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:6,marginBottom:8}}>
+              <Input type="number" value={adjAmt} onChange={e=>setAdjAmt(parseInt(e.target.value)||0)} style={{width:100}}/>
+              <Input value={adjReason} onChange={e=>setAdjReason(e.target.value)} placeholder="Reason" style={{flex:1}}/>
+            </div>
+            <Btn onClick={applyAdj} style={{width:"100%",marginBottom:"1rem"}}>Apply</Btn>
+            <SectionLabel>Recent Transactions</SectionLabel>
+            <div style={{maxHeight:160,overflowY:"auto"}}>
+              {team.transactions.slice(0,20).map((tx,i)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:"1px solid #0f172a",fontSize:12}}>
+                  <div style={{display:"flex",gap:6,alignItems:"center"}}><TxBadge type={tx.type}/><span style={{color:"#94a3b8"}}>{tx.reason}</span></div>
+                  <span style={{color:["sell","salary","bonus"].includes(tx.type)?"#22c55e":"#ef4444"}}>{["sell","salary","bonus"].includes(tx.type)?"+":"-"}🪙{(tx.qty*(tx.amount||0)||tx.amount).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PageLeaderboard({sorted,commodities,round}){
+  const medals=["🥇","🥈","🥉"];
+  return(
+    <Card>
+      <SectionLabel>Live Leaderboard — Round {round}</SectionLabel>
+      {sorted.map((t,i)=>{
+        const nw=netWorth(t,commodities);
+        const pct=sorted[0]?(nw/netWorth(sorted[0],commodities))*100:100;
+        return(
+          <div key={t.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px",borderRadius:10,background:i<3?"#0f172a":"transparent",border:i<3?`1px solid ${t.color}33`:"1px solid transparent",marginBottom:6}}>
+            <span style={{fontSize:i<3?22:14,width:32,textAlign:"center",color:"#475569"}}>{i<3?medals[i]:`${i+1}.`}</span>
+            <Avatar name={t.name} color={t.color} size={36}/>
+            <div style={{flex:1}}>
+              <p style={{margin:"0 0 4px",fontSize:14,color:"#e2e8f0"}}>{t.name}</p>
+              <div style={{height:4,background:"#1e293b",borderRadius:2}}><div style={{height:"100%",width:`${pct}%`,background:t.color,borderRadius:2,transition:"width .5s"}}/></div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <p style={{margin:0,fontSize:16,color:"#a78bfa",fontWeight:700}}>🪙 {nw.toLocaleString()}</p>
+              <p style={{margin:0,fontSize:11,color:"#22c55e"}}>🪙 {t.cash.toLocaleString()} cash</p>
+            </div>
+          </div>
+        );
+      })}
+    </Card>
+  );
+}
+
+function PageOperators({operatorPin,setOperatorPin,addAudit}){
+  const[val,setVal]=useState("");const[msg,setMsg]=useState("");
+  function save(){if(val.length<3){setMsg("Min 3 characters");return;}setOperatorPin(val);addAudit("Operator PIN updated");setMsg("✅ PIN updated");setVal("");setTimeout(()=>setMsg(""),2500);}
+  return(
+    <Card style={{maxWidth:400}}>
+      <SectionLabel>Operator PIN</SectionLabel>
+      <p style={{color:"#64748b",fontSize:13,margin:"0 0 12px"}}>This shared PIN is used by all operator station logins.</p>
+      <Input type="password" value={val} onChange={e=>setVal(e.target.value)} placeholder="New operator PIN" style={{width:"100%",marginBottom:10,boxSizing:"border-box"}}/>
+      {msg&&<p style={{fontSize:12,color:msg.startsWith("✅")?"#86efac":"#fca5a5",margin:"0 0 8px"}}>{msg}</p>}
+      <Btn onClick={save} color="#14532d" border="#22c55e" textColor="#86efac">Update PIN</Btn>
+    </Card>
+  );
+}
+
+function PageAudit({auditLog}){
+  return(
+    <Card>
+      <SectionLabel>Full Audit Log ({auditLog.length} entries)</SectionLabel>
+      <div style={{maxHeight:"70vh",overflowY:"auto"}}>
+        {auditLog.length===0?<p style={{color:"#334155",fontSize:13}}>No entries yet.</p>:
+          auditLog.map((l,i)=>(
+            <div key={i} style={{display:"flex",gap:12,padding:"6px 0",borderBottom:"1px solid #0f172a",fontSize:12}}>
+              <span style={{color:"#334155",flexShrink:0,width:80}}>{l.ts}</span>
+              <span style={{color:"#94a3b8",flex:1}}>{l.msg}</span>
+            </div>
+          ))}
+      </div>
+    </Card>
+  );
+}
+
+function PageDanger({resetGame,adminPin,setAdminPin,addAudit}){
+  const[newPin,setNewPin]=useState("");const[msg,setMsg]=useState("");
+  function save(){if(newPin.length<3){setMsg("Min 3 characters");return;}setAdminPin(newPin);addAudit("Super Admin PIN changed");setMsg("✅ Updated");setNewPin("");setTimeout(()=>setMsg(""),2500);}
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
+      <Card>
+        <SectionLabel>Super Admin PIN</SectionLabel>
+        <Input type="password" value={newPin} onChange={e=>setNewPin(e.target.value)} placeholder="New admin PIN" style={{width:"100%",marginBottom:10,boxSizing:"border-box"}}/>
+        {msg&&<p style={{fontSize:12,color:msg.startsWith("✅")?"#86efac":"#fca5a5",margin:"0 0 8px"}}>{msg}</p>}
+        <Btn onClick={save} color="#14532d" border="#22c55e" textColor="#86efac">Update PIN</Btn>
+      </Card>
+      <Card style={{border:"1px solid #991b1b"}}>
+        <SectionLabel>Danger Zone</SectionLabel>
+        <p style={{color:"#64748b",fontSize:13,margin:"0 0 16px"}}>Irreversible. Use with extreme caution.</p>
+        <Btn onClick={()=>{if(window.confirm("Reset entire game? Cannot be undone."))resetGame();}} color="#450a0a" border="#dc2626" textColor="#fca5a5" style={{width:"100%",padding:"10px"}}>⚠ Reset Entire Game</Btn>
+      </Card>
+    </div>
+  );
+}
+
+// ── Operator Portal ──
+function OperatorPortal({operatorPin,commodities,teams,tradingOpen,applyTx,addAudit,onLogout}){
+  const[authed,setAuthed]=useState(false);
+  const[selTeam,setSelTeam]=useState(null);
+  const[txType,setTxType]=useState("buy");
+  const[selComm,setSelComm]=useState(commodities[0]?.id);
+  const[qty,setQty]=useState(1);
+  const[bonusAmt,setBonusAmt]=useState(500);
+  const[bonusReason,setBonusReason]=useState("");
+  const[search,setSearch]=useState("");
+  const[msg,setMsg]=useState("");
+  if(!authed)return <PinLogin title="OPERATOR STATION" sub="TRADING OPERATIONS" icon="⚙" correctPin={operatorPin} onSuccess={()=>setAuthed(true)} onBack={onLogout}/>;
+  const team=teams.find(t=>t.id===selTeam);
+  const comm=commodities.find(c=>c.id===selComm);
+  const filtered=teams.filter(t=>t.name.toLowerCase().includes(search.toLowerCase()));
+  function doTrade(){
+    if(!team||!tradingOpen)return;
+    const total=qty*(comm?.price||0);
+    if(txType==="buy"&&team.cash<total){setMsg("❌ Insufficient funds");return;}
+    if(txType==="sell"&&(team.holdings[selComm]||0)<qty){setMsg("❌ Insufficient stock");return;}
+    applyTx(team.id,txType,selComm,qty,comm.price,`${txType} ${comm.name}`);
+    addAudit(`[OP] ${txType.toUpperCase()} ${qty}x ${comm.name} @ 🪙${comm.price} for ${team.name}`);
+    setMsg(`✅ ${txType==="buy"?"Bought":"Sold"} ${qty}x ${comm.name}`);
+    setTimeout(()=>setMsg(""),2500);
+  }
+  function doBonus(isBonus){
+    if(!team||!bonusReason){setMsg("❌ Add a reason");return;}
+    applyTx(team.id,isBonus?"bonus":"penalty",null,1,bonusAmt,bonusReason);
+    addAudit(`[OP] ${isBonus?"BONUS":"PENALTY"} 🪙${bonusAmt} → ${team.name}: ${bonusReason}`);
+    setMsg(`✅ ${isBonus?"+":"-"}🪙${bonusAmt} applied`);
+    setBonusReason("");setTimeout(()=>setMsg(""),2500);
+  }
+  return(
+    <div style={{background:"#0a0a0f",minHeight:"100vh",fontFamily:"monospace",color:"#e2e8f0"}}>
+      <div style={{background:"#0d0d14",borderBottom:"1px solid #1e293b",padding:"12px 1.5rem",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <span style={{color:"#93c5fd",fontSize:15,fontWeight:700}}>⚙ OPERATOR STATION</span>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <span style={{fontSize:12,color:tradingOpen?"#22c55e":"#ef4444",background:tradingOpen?"#052e16":"#450a0a",padding:"4px 10px",borderRadius:20,border:`1px solid ${tradingOpen?"#166534":"#991b1b"}`}}>● {tradingOpen?"TRADING OPEN":"TRADING CLOSED"}</span>
+          <button onClick={onLogout} style={{background:"none",border:"1px solid #1e293b",borderRadius:8,color:"#475569",cursor:"pointer",fontFamily:"monospace",fontSize:12,padding:"5px 12px"}}>🚪 Logout</button>
+        </div>
+      </div>
+      <div style={{padding:"1.5rem",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
+        <div>
+          <Card style={{marginBottom:"1rem"}}>
+            <SectionLabel>Market Prices</SectionLabel>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:6}}>
+              {commodities.map(c=><PriceBadge key={c.id} c={c}/>)}
+            </div>
+          </Card>
+          <Card>
+            <SectionLabel>Select Team</SectionLabel>
+            <Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search teams..." style={{width:"100%",marginBottom:8,boxSizing:"border-box"}}/>
+            <div style={{maxHeight:320,overflowY:"auto"}}>
+              {filtered.map(t=>(
+                <div key={t.id} onClick={()=>setSelTeam(t.id)} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:8,cursor:"pointer",background:selTeam===t.id?"#1e1b4b":"transparent",border:selTeam===t.id?"1px solid #3730a3":"1px solid transparent",marginBottom:4}}>
+                  <Avatar name={t.name} color={t.color} size={32}/>
+                  <div style={{flex:1}}>
+                    <p style={{margin:0,fontSize:13,color:"#e2e8f0"}}>{t.name}</p>
+                    <p style={{margin:0,fontSize:11,color:"#64748b"}}>🪙 {t.cash.toLocaleString()} cash</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+        <Card>
+          <SectionLabel>Transaction</SectionLabel>
+          {!team?<p style={{color:"#334155",textAlign:"center",padding:"2rem 0"}}>Select a team to begin.</p>:(
+            <>
+              <div style={{display:"flex",alignItems:"center",gap:10,background:"#0f172a",padding:"10px 12px",borderRadius:8,marginBottom:12}}>
+                <Avatar name={team.name} color={team.color} size={34}/>
+                <div><p style={{margin:0,fontSize:14,color:"#e2e8f0"}}>{team.name}</p><p style={{margin:0,fontSize:12,color:"#22c55e"}}>🪙 {team.cash.toLocaleString()} cash</p></div>
+              </div>
+              <div style={{display:"flex",gap:6,marginBottom:12}}>
+                {["buy","sell"].map(type=>(
+                  <button key={type} onClick={()=>setTxType(type)} style={{flex:1,padding:"9px",background:txType===type?(type==="buy"?"#14532d":"#450a0a"):"#0f172a",border:`1px solid ${txType===type?(type==="buy"?"#22c55e":"#ef4444"):"#1e293b"}`,color:txType===type?(type==="buy"?"#86efac":"#fca5a5"):"#64748b",borderRadius:8,cursor:"pointer",fontSize:14,fontFamily:"monospace",letterSpacing:1}}>{type.toUpperCase()}</button>
+                ))}
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:12}}>
+                {commodities.map(c=>(
+                  <button key={c.id} onClick={()=>setSelComm(c.id)} style={{padding:"8px",background:selComm===c.id?"#1e1b4b":"#0f172a",border:`1px solid ${selComm===c.id?"#7c3aed":"#1e293b"}`,borderRadius:8,cursor:"pointer",textAlign:"left",fontFamily:"monospace"}}>
+                    <div style={{fontSize:16}}>{c.icon}</div>
+                    <div style={{fontSize:12,color:"#e2e8f0"}}>{c.name}</div>
+                    <div style={{fontSize:11,color:"#a78bfa"}}>🪙 {c.price.toLocaleString()}</div>
+                    {txType==="sell"&&<div style={{fontSize:10,color:"#64748b"}}>Have: {team.holdings[c.id]||0}</div>}
+                  </button>
+                ))}
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                <button onClick={()=>setQty(q=>Math.max(1,q-1))} style={{width:32,height:32,background:"#0f172a",border:"1px solid #1e293b",borderRadius:6,color:"#e2e8f0",cursor:"pointer",fontSize:16}}>−</button>
+                <Input type="number" value={qty} onChange={e=>setQty(Math.max(1,parseInt(e.target.value)||1))} style={{width:60,textAlign:"center"}}/>
+                <button onClick={()=>setQty(q=>q+1)} style={{width:32,height:32,background:"#0f172a",border:"1px solid #1e293b",borderRadius:6,color:"#e2e8f0",cursor:"pointer",fontSize:16}}>+</button>
+                <span style={{marginLeft:"auto",color:"#a78bfa",fontSize:13}}>Total: 🪙 {(qty*(comm?.price||0)).toLocaleString()}</span>
+              </div>
+              <Btn onClick={doTrade} disabled={!tradingOpen} style={{width:"100%",padding:"10px"}}>{tradingOpen?`CONFIRM ${txType.toUpperCase()}`:"TRADING CLOSED"}</Btn>
+              <div style={{borderTop:"1px solid #1e293b",marginTop:16,paddingTop:16}}>
+                <SectionLabel>Bonus / Penalty</SectionLabel>
+                <div style={{display:"flex",gap:6,marginBottom:8}}>
+                  <Input type="number" value={bonusAmt} onChange={e=>setBonusAmt(parseInt(e.target.value)||0)} style={{width:90}}/>
+                  <Input value={bonusReason} onChange={e=>setBonusReason(e.target.value)} placeholder="Reason" style={{flex:1}}/>
+                </div>
+                <div style={{display:"flex",gap:6}}>
+                  <Btn onClick={()=>doBonus(true)} color="#052e16" border="#166534" textColor="#86efac" style={{flex:1}}>＋ Bonus</Btn>
+                  <Btn onClick={()=>doBonus(false)} color="#450a0a" border="#991b1b" textColor="#fca5a5" style={{flex:1}}>－ Penalty</Btn>
+                </div>
+              </div>
+              {msg&&<div style={{marginTop:10,padding:"8px 12px",background:"#0f172a",borderRadius:8,color:msg.startsWith("✅")?"#86efac":"#fca5a5",fontSize:13,textAlign:"center"}}>{msg}</div>}
+            </>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ── Team Portal ──
+function TeamPortal({teams,commodities,activeScenario,round,tradingOpen,sorted,onLogout,activeTeamId,setActiveTeamId,priceHistory}){
+  const[loggedIn,setLoggedIn]=useState(!!activeTeamId);
+  const[teamId,setTeamId]=useState(activeTeamId);
+  function handleSelect(id){setTeamId(id);setActiveTeamId(id);setLoggedIn(true);}
+  if(!loggedIn)return <TeamLogin teams={teams} onSelect={handleSelect} onBack={onLogout}/>;
+  const team=teams.find(t=>t.id===teamId);
+  if(!team)return <TeamLogin teams={teams} onSelect={handleSelect} onBack={onLogout}/>;
+  const rank=sorted.findIndex(t=>t.id===teamId)+1;
+  const nw=netWorth(team,commodities);
+  const holdVal=nw-team.cash;
+  return(
+    <div style={{background:"#0a0a0f",minHeight:"100vh",fontFamily:"monospace",color:"#e2e8f0"}}>
+      <div style={{background:"#0d0d14",borderBottom:"1px solid #1e293b",padding:"12px 1.5rem",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <Avatar name={team.name} color={team.color} size={34}/>
+          <div>
+            <p style={{margin:0,fontSize:15,color:"#e2e8f0",fontWeight:700}}>{team.name}</p>
+            <p style={{margin:0,fontSize:11,color:"#64748b"}}>Rank #{rank} · Round {round} · {activeScenario.name}</p>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <span style={{fontSize:12,color:tradingOpen?"#22c55e":"#ef4444",background:tradingOpen?"#052e16":"#450a0a",padding:"4px 10px",borderRadius:20,border:`1px solid ${tradingOpen?"#166534":"#991b1b"}`}}>● {tradingOpen?"TRADING OPEN":"CLOSED"}</span>
+          <button onClick={()=>{setLoggedIn(false);setTeamId(null);setActiveTeamId(null);}} style={{background:"none",border:"1px solid #1e293b",borderRadius:8,color:"#475569",cursor:"pointer",fontFamily:"monospace",fontSize:12,padding:"5px 12px"}}>🚪 Logout</button>
+        </div>
+      </div>
+      <div style={{padding:"1.5rem",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
+        <div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:"1rem"}}>
+            {[
+              {label:"NET WORTH",val:`🪙 ${nw.toLocaleString()}`,color:"#a78bfa"},
+              {label:"CASH BALANCE",val:`🪙 ${team.cash.toLocaleString()}`,color:"#22c55e"},
+              {label:"HOLDINGS VALUE",val:`🪙 ${holdVal.toLocaleString()}`,color:"#3b82f6"},
+              {label:"LEADERBOARD RANK",val:`#${rank} of ${teams.length}`,color:"#f59e0b"},
+            ].map(s=>(
+              <div key={s.label} style={{background:"#111118",border:"1px solid #1e293b",borderRadius:10,padding:"14px"}}>
+                <p style={{margin:"0 0 4px",fontSize:10,color:"#475569"}}>{s.label}</p>
+                <p style={{margin:0,fontSize:18,fontWeight:700,color:s.color}}>{s.val}</p>
+              </div>
+            ))}
+          </div>
+          <Card style={{marginBottom:"1rem"}}>
+            <SectionLabel>Current Scenario</SectionLabel>
+            <p style={{margin:"0 0 4px",fontSize:14,color:"#a78bfa",fontWeight:700}}>{activeScenario.name}</p>
+            <p style={{margin:"0 0 10px",fontSize:12,color:"#64748b"}}>{activeScenario.desc}</p>
+            <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+              {commodities.map(c=>{const eff=activeScenario.effects?.[c.id]||1;const col=eff>1?"#22c55e":eff<1?"#ef4444":"#64748b";return <span key={c.id} style={{fontSize:11,padding:"2px 8px",borderRadius:4,background:"#0f172a",color:col}}>{c.icon} {eff>1?"+":""}{((eff-1)*100).toFixed(0)}%</span>;})}
+            </div>
+          </Card>
+          <Card style={{marginBottom:"1rem"}}>
+            <SectionLabel>Market Prices</SectionLabel>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:6}}>
+              {commodities.map(c=><PriceBadge key={c.id} c={c}/>)}
+            </div>
+          </Card>
+          <Card>
+            <SectionLabel>Your Holdings</SectionLabel>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>
+              {commodities.map(c=>(
+                <div key={c.id} style={{background:"#0f172a",borderRadius:8,padding:"10px 6px",textAlign:"center",opacity:(team.holdings[c.id]||0)===0?.35:1,border:`1px solid ${c.color}22`}}>
+                  <div style={{fontSize:22}}>{c.icon}</div>
+                  <div style={{fontSize:16,fontWeight:700,color:c.color}}>{team.holdings[c.id]||0}</div>
+                  <div style={{fontSize:10,color:"#64748b"}}>{c.name}</div>
+                  <div style={{fontSize:10,color:"#475569"}}>🪙 {((team.holdings[c.id]||0)*c.price).toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+        <div>
+          <Card style={{marginBottom:"1rem"}}>
+            <SectionLabel>Commodity Price History (per round)</SectionLabel>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+              {commodities.map(c=>{
+                const hist=priceHistory[c.id]||[c.price];
+                const latest=hist[hist.length-1];
+                const prev=hist.length>=2?hist[hist.length-2]:null;
+                const change=prev?((latest-prev)/prev*100).toFixed(1):null;
+                return(
+                  <div key={c.id} style={{background:"#0f172a",borderRadius:10,padding:"12px"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                      <div style={{display:"flex",alignItems:"center",gap:6}}>
+                        <span style={{fontSize:16}}>{c.icon}</span>
+                        <span style={{fontSize:12,color:"#94a3b8"}}>{c.name}</span>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <div style={{fontSize:13,fontWeight:700,color:c.color}}>🪙 {latest.toLocaleString()}</div>
+                        {change!==null&&<div style={{fontSize:10,color:parseFloat(change)>0?"#22c55e":parseFloat(change)<0?"#ef4444":"#64748b"}}>{parseFloat(change)>0?"▲":"▼"} {Math.abs(change)}%</div>}
+                      </div>
+                    </div>
+                    <Sparkline data={hist} color={c.color} width={150} height={52}/>
+                    <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                      {hist.map((_,i)=><span key={i} style={{fontSize:9,color:"#334155"}}>R{i+1}</span>)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+          <Card style={{marginBottom:"1rem"}}>
+            <SectionLabel>Leaderboard</SectionLabel>
+            <div style={{maxHeight:340,overflowY:"auto"}}>
+              {sorted.map((t,i)=>(
+                <div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 10px",borderRadius:8,background:t.id===teamId?"#1e1b4b":"transparent",border:t.id===teamId?"1px solid #3730a3":"1px solid transparent",marginBottom:3}}>
+                  <span style={{fontSize:i<3?18:12,width:28,textAlign:"center",color:i<3?"inherit":"#475569"}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`}</span>
+                  <Avatar name={t.name} color={t.color} size={26}/>
+                  <span style={{flex:1,fontSize:12,color:t.id===teamId?"#c4b5fd":"#94a3b8"}}>{t.name}{t.id===teamId?" (you)":""}</span>
+                  <span style={{fontSize:12,color:"#a78bfa",fontWeight:700}}>🪙 {netWorth(t,commodities).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+          <Card>
+            <SectionLabel>Transaction History</SectionLabel>
+            <div style={{maxHeight:220,overflowY:"auto"}}>
+              {team.transactions.length===0?<p style={{color:"#334155",fontSize:12}}>No transactions yet.</p>:
+                team.transactions.map((tx,i)=>(
+                  <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:"1px solid #0f172a",fontSize:12}}>
+                    <div style={{display:"flex",gap:6,alignItems:"center"}}><TxBadge type={tx.type}/><span style={{color:"#94a3b8"}}>{tx.reason}</span></div>
+                    <div style={{textAlign:"right"}}>
+                      <span style={{color:["sell","salary","bonus"].includes(tx.type)?"#22c55e":"#ef4444"}}>{["sell","salary","bonus"].includes(tx.type)?"+":"-"}🪙{(tx.qty*(tx.amount||0)||tx.amount).toLocaleString()}</span>
+                      <div style={{color:"#334155",fontSize:10}}>{tx.ts}</div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Root App ──
+function App(){
+  const[screen,setScreen]=useState("landing");
+  const[commodities,setCommodities]=useState(INIT_COMMODITIES);
+  const[scenarios,setScenarios]=useState(INIT_SCENARIOS);
+  const[salaries,setSalaries]=useState(INIT_SALARIES);
+  const[teams,setTeams]=useState(()=>makeTeams(INIT_COMMODITIES));
+  const[round,setRound]=useState(1);
+  const[activeScenario,setActiveScenario]=useState(INIT_SCENARIOS[0]);
+  const[tradingOpen,setTradingOpen]=useState(true);
+  const[auditLog,setAuditLog]=useState([]);
+  const[pendingSalaries,setPendingSalaries]=useState([]);
+  const[adminPin,setAdminPin]=useState("1234");
+  const[operatorPin,setOperatorPin]=useState("0000");
+  const[activeTeamId,setActiveTeamId]=useState(null);
+  const[priceHistory,setPriceHistory]=useState(()=>Object.fromEntries(INIT_COMMODITIES.map(c=>[c.id,[c.price]])));
+
+  const addAudit=useCallback((msg)=>{setAuditLog(l=>[{msg,ts:ts()},...l].slice(0,200));},[]);
+
+  const applyTx=useCallback((teamId,type,commodityId,qty,amount,reason)=>{
+    setTeams(prev=>prev.map(t=>{
+      if(t.id!==teamId)return t;
+      let cash=t.cash,holdings={...t.holdings};
+      if(type==="buy"){cash-=qty*amount;holdings[commodityId]=(holdings[commodityId]||0)+qty;}
+      if(type==="sell"){cash+=qty*amount;holdings[commodityId]=Math.max(0,(holdings[commodityId]||0)-qty);}
+      if(type==="salary"||type==="bonus")cash+=amount;
+      if(type==="penalty")cash-=amount;
+      if(type==="adjustment")cash+=amount;
+      const tx={type,commodityId,qty,amount,reason,ts:ts()};
+      return{...t,cash,holdings,transactions:[tx,...t.transactions].slice(0,100)};
+    }));
+  },[]);
+
+  const startRound=useCallback((nextRound,scenarioId)=>{
+    const sc=scenarios.find(s=>s.id===scenarioId)||scenarios[0];
+    const newComms=commodities.map(c=>({...c,price:Math.round(c.price*(sc.effects[c.id]||1))}));
+    setCommodities(newComms);
+    setPriceHistory(prev=>{const next={...prev};newComms.forEach(c=>{next[c.id]=[...(prev[c.id]||[]),c.price];});return next;});
+    setRound(nextRound);setActiveScenario(sc);setTradingOpen(true);
+    const sal=salaries[(nextRound-1)%salaries.length];
+    if(sal>0){
+      setPendingSalaries(teams.map(t=>({teamId:t.id,amount:sal,round:nextRound})));
+      addAudit(`Round ${nextRound} started · ${sc.name} · ${teams.length} salary approvals pending`);
+    }else{
+      addAudit(`Round ${nextRound} started · ${sc.name} · No salary this round`);
+    }
+  },[scenarios,salaries,teams,commodities,addAudit]);
+
+  const approveSalary=useCallback((teamId)=>{
+    const entry=pendingSalaries.find(p=>p.teamId===teamId);
+    if(!entry)return;
+    applyTx(teamId,"salary",null,1,entry.amount,`Salary R${entry.round}`);
+    addAudit(`Salary approved · ${teams.find(t=>t.id===teamId)?.name} · 🪙${entry.amount.toLocaleString()}`);
+    setPendingSalaries(p=>p.filter(x=>x.teamId!==teamId));
+  },[pendingSalaries,applyTx,addAudit,teams]);
+
+  const approveAllSalaries=useCallback(()=>{
+    pendingSalaries.forEach(p=>applyTx(p.teamId,"salary",null,1,p.amount,`Salary R${p.round}`));
+    addAudit(`All salaries approved · Round ${round}`);
+    setPendingSalaries([]);
+  },[pendingSalaries,applyTx,addAudit,round]);
+
+  const resetGame=useCallback(()=>{
+    setTeams(makeTeams(commodities));
+    setRound(1);setActiveScenario(scenarios[0]);setTradingOpen(true);
+    setPendingSalaries([]);setAuditLog([]);
+    setPriceHistory(Object.fromEntries(commodities.map(c=>[c.id,[c.price]])));
+    addAudit("⚠ GAME RESET by Super Admin");
+  },[commodities,scenarios,addAudit]);
+
+  const sorted=[...teams].sort((a,b)=>netWorth(b,commodities)-netWorth(a,commodities));
+
+  const shared={commodities,setCommodities,scenarios,setScenarios,salaries,setSalaries,teams,setTeams,round,setRound,activeScenario,tradingOpen,setTradingOpen,auditLog,pendingSalaries,adminPin,setAdminPin,operatorPin,setOperatorPin,sorted,applyTx,addAudit,startRound,approveSalary,approveAllSalaries,resetGame,activeTeamId,setActiveTeamId,setScreen,priceHistory};
+
+  if(screen==="landing") return <Landing setScreen={setScreen} adminPin={adminPin} operatorPin={operatorPin}/>;
+  if(screen==="admin")   return <AdminPortal {...shared} onLogout={()=>setScreen("landing")}/>;
+  if(screen==="operator")return <OperatorPortal {...shared} onLogout={()=>setScreen("landing")}/>;
+  if(screen==="team")    return <TeamPortal {...shared} onLogout={()=>setScreen("landing")}/>;
+  if(screen==="display") return <DisplayScreen {...shared} onBack={()=>setScreen("landing")}/>;
+  return <Landing setScreen={setScreen} adminPin={adminPin} operatorPin={operatorPin}/>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
